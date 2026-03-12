@@ -2,12 +2,25 @@ let files = [];
 
 async function loadFiles(){
   try{
+
     let res = await fetch("/api/files");
+
+    if(!res.ok){
+    let text = await res.text();
+    console.error("Server error:", text);
+    return;
+    }
+
     files = await res.json();
+
+    console.log("FILES:", files); // debug
+
     renderFiles();
 
     // open file after files loaded
+    if(files.length > 0){
     openFileFromURL();
+    }
 
   }catch(err){
     console.log("Error loading files", err);
@@ -43,27 +56,28 @@ const OTP_SESSION_TIME = 10 * 60 * 1000;
 
 /* ================= RENDER FILES ================= */
 function renderFiles() {
-    let container = document.getElementById("files");
-    let searchBox = document.getElementById("search");
 
-    if (!container || !searchBox) return;
+  let container = document.getElementById("files");
+ let searchBox = document.getElementById("search");
+let search = searchBox ? searchBox.value.toLowerCase() : "";
+  container.innerHTML = "";
 
-    let search = searchBox.value.toLowerCase();
-    container.innerHTML = "";
+  files
+  .filter(file =>
+      (categoryFilter === "All" || file.category === categoryFilter) &&
+      file.name.toLowerCase().includes(search)
+  )
+  .forEach((file,index)=>{
 
-    files
-        .filter(f =>
-            f.name.toLowerCase().includes(search) &&
-            (categoryFilter === "All" || f.category === categoryFilter)
-        )
-        .forEach((file, index) => {
-            container.innerHTML += `
+    container.innerHTML += `
       <div class="card">
         <h4>${file.name}</h4>
         <small>${file.category}</small>
-        <button onclick="viewFile(${index})">View</button>
-      </div>`;
-        });
+        <button class="viewBtn" data-index="${index}">View</button>
+      </div>
+    `;
+
+  });
 }
 
 async function loadCategoriesToFilter() {
@@ -88,7 +102,9 @@ function changeFilter() {
 
 function downloadFile(file) {
 
-    window.open(file.url);
+    const mobile = sessionStorage.getItem("verifiedMobile") || "Unknown";
+
+window.open("/secure-files/" + file.name + "?mobile=" + mobile);
 
     let downloadLogs = JSON.parse(localStorage.getItem("downloadLogs")) || [];
 
@@ -109,6 +125,7 @@ async function viewFile(index) {
     let mobile =
         sessionStorage.getItem("verifiedMobile") || currentMobile;
 
+    // check if user blocked
     if (mobile) {
         let res = await fetch("/api/users/check-block", {
             method: "POST",
@@ -124,16 +141,24 @@ async function viewFile(index) {
         }
     }
 
+    /* ⭐ OTP SESSION CHECK */
+
     if (isOtpValid()) {
+
+        console.log("OTP still valid → open viewer");
         openViewer();
+
     } else {
+
+        console.log("OTP expired → ask OTP");
+
         document.getElementById("otpModal").style.display = "flex";
         document.getElementById("mobileStep").style.display = "block";
         document.getElementById("otpStep").style.display = "none";
         document.getElementById("resultStep").style.display = "none";
     }
-}
 
+}
 
 /* ================= SEND OTP ================= */
 async function sendOtp() {
@@ -285,28 +310,20 @@ function closeOtp() {
 
 
 
-window.addEventListener("load", () => {
-  loadFiles();
-  loadCategoriesToFilter();
-    initPhoneInput();
-});
 
 function initPhoneInput(){
 
-  let phoneInput = document.querySelector("#mobileInput");
-  if(!phoneInput) return;
+  const phoneInput = document.querySelector("#mobileInput");
 
-  if(window.intlTelInput){
-    window.iti = window.intlTelInput(phoneInput, {
-      initialCountry: "in",
-      nationalMode: false,
-      separateDialCode: true,
-      autoPlaceholder: "aggressive",
-      preferredCountries: ["in","us","gb"],
-      utilsScript:
-        "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js"
-    });
-  }
+  if(!phoneInput || !window.intlTelInput) return;
+
+  window.iti = window.intlTelInput(phoneInput,{
+    initialCountry:"in",
+    separateDialCode:true,
+    preferredCountries:["in","us","gb"],
+    utilsScript:"https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js"
+  });
+
 }
 async function loadPDF(url) {
 
@@ -359,6 +376,7 @@ async function loadPDF(url) {
     }).promise;
   }
 }
+
 function openViewer() {
 
   let file = files[selectedFileIndex];
@@ -371,70 +389,108 @@ function openViewer() {
   const container = document.getElementById("pdfContainer");
   container.innerHTML = "";
 
-  const fileUrl = "/secure-files/" + file.name;
-  const ext = file.name.split('.').pop().toLowerCase();
+  const mobile = sessionStorage.getItem("verifiedMobile") || "Unknown";
+const fileUrl = "/secure-files/" + file.name + "?mobile=" + mobile;
+  const ext = file.name.split(".").pop().toLowerCase();
 
-  // ===== PDF =====
-  if (ext === "pdf") {
-      loadPDF(fileUrl);
+  const downloadBtn = document.getElementById("downloadBtn");
+
+  /* CONTROL DOWNLOAD BUTTON */
+
+  if(file.importance === "important"){   // VIEW ONLY
+
+    downloadBtn.style.display = "none";
+
+  }else{                                 // VIEW + DOWNLOAD
+
+    downloadBtn.style.display = "block";
+
+    downloadBtn.onclick = function(){
+
+      const link = document.createElement("a");
+      link.href = fileUrl;
+      link.download = file.name;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+    };
+
   }
 
-  // ===== IMAGE =====
+  /* FILE VIEWER */
+
+  if (ext === "pdf") {
+    loadPDF(fileUrl);
+  }
+
   else if (["jpg","jpeg","png","webp"].includes(ext)) {
 
-      const img = document.createElement("img");
-      img.src = fileUrl;
-      img.style.width = "100%";
-      img.style.maxHeight = "85vh";
-      img.style.objectFit = "contain";
+    const img = document.createElement("img");
+    img.src = fileUrl;
+    img.style.width = "100%";
+    img.style.maxHeight = "85vh";
+    img.style.objectFit = "contain";
 
-      container.appendChild(img);
+    container.appendChild(img);
   }
 
-  // ===== DOC / DOCX =====
   else if (["doc","docx"].includes(ext)) {
 
-      const iframe = document.createElement("iframe");
-      iframe.src =
-        "https://view.officeapps.live.com/op/embed.aspx?src=" +
-        encodeURIComponent(window.location.origin + fileUrl);
+    const iframe = document.createElement("iframe");
 
-      iframe.style.width = "100%";
-      iframe.style.height = "85vh";
-      iframe.style.border = "none";
+    iframe.src =
+      "https://view.officeapps.live.com/op/embed.aspx?src=" +
+      encodeURIComponent(window.location.origin + fileUrl);
 
-      container.appendChild(iframe);
+    iframe.style.width = "100%";
+    iframe.style.height = "85vh";
+    iframe.style.border = "none";
+
+    container.appendChild(iframe);
   }
-
-  // ===== OTHER FILES =====
-  else {
-      container.innerHTML =
-        "<p style='padding:20px'>Preview not supported. Please download.</p>";
-  }
+console.log("Opening viewer:", file);
 }
-document.addEventListener("keydown", function(e) {
+document.addEventListener("keydown", function(e){
 
-  if (document.getElementById("viewerModal").style.display !== "flex") return;
+ if (document.getElementById("viewerModal").style.display !== "flex") return;
 
-  // Disable Ctrl+S, Ctrl+P, Ctrl+U
-  if (
-    (e.ctrlKey && e.key === "s") ||
-    (e.ctrlKey && e.key === "p") ||
-    (e.ctrlKey && e.key === "u")
-  ) {
-    e.preventDefault();
-  }
+ if(
+  (e.ctrlKey && e.key === "s") ||
+  (e.ctrlKey && e.key === "p") ||
+  (e.ctrlKey && e.key === "u")
+ ){
+  e.preventDefault();
+ }
 
-  // Disable PrintScreen
-  if (e.key === "PrintScreen") {
-    navigator.clipboard.writeText("");
-    alert("Screenshot disabled");
-  }
+ if(e.key==="PrintScreen"){
+  navigator.clipboard.writeText("Screenshot blocked");
+  alert("Screenshot disabled");
+ }
+
 });
 
+document.addEventListener("keyup",function(e){
+ if(e.key==="PrintScreen"){
+  alert("Screenshot disabled");
+ }
+});
+
+
 function closeViewer() {
-    document.getElementById("viewerModal").style.display = "none";
-    document.getElementById("pdfContainer").innerHTML = "";
+
+  const viewer = document.getElementById("viewerModal");
+  const container = document.getElementById("pdfContainer");
+
+  if(viewer){
+    viewer.style.display = "none";
+  }
+
+  if(container){
+    container.innerHTML = "";
+  }
+
 }
 /* ================= OTP SESSION ================= */
 function isOtpValid() {
@@ -443,29 +499,7 @@ function isOtpValid() {
     return Date.now() - t < OTP_SESSION_TIME;
 }
 
-/* ================= OTP INPUT AUTO ================= */
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".otp-boxes input")
-        .forEach((box, i, arr) => {
 
-            box.addEventListener("input", () => {
-                if (box.value && arr[i + 1]) arr[i + 1].focus();
-
-                let otp = "";
-                arr.forEach(i => otp += i.value);
-                if (otp.length === 4) verifyOtp();
-            });
-
-            box.addEventListener("keydown", (e) => {
-                if (e.key === "Backspace" && !box.value && arr[i - 1]) {
-                    arr[i - 1].focus();
-                }
-            });
-
-        });
-    loadCategoriesToFilter();
-    renderFiles();
-});
 function getFileFromURL() {
   let params = new URLSearchParams(window.location.search);
   return params.get("file");
@@ -481,17 +515,7 @@ async function saveViewLog(fileName) {
   let logs = JSON.parse(localStorage.getItem("viewLogs")) || [];
 
   // Get location from free API
-  let location = { country: "-", region: "-" };
-
-  try {
-    let res = await fetch("https://ipapi.co/json/");
-    let data = await res.json();
-
-    location.country = data.country_code || "-";
-    location.region = data.region || "-";
-  } catch(e){
-    console.log("Location fetch failed");
-  }
+let location = { country:"-", region:"-" };
 
   logs.push({
       file: fileName,
@@ -570,7 +594,7 @@ function checkIfBlocked() {
 setInterval(() => {
   let mobile = sessionStorage.getItem("verifiedMobile");
   if (mobile) checkIfBlocked();
-}, 3000);
+}, 30000);
 
 /* Blur viewer when tab hidden */
 document.addEventListener("visibilitychange", function () {
@@ -595,4 +619,80 @@ setInterval(() => {
     body: JSON.stringify({ mobile })
   });
 
-}, 5000);
+}, 60000);
+window.addEventListener("DOMContentLoaded", () => {
+
+  loadFiles();
+  loadCategoriesToFilter();
+  initPhoneInput();
+
+  document.getElementById("search").addEventListener("keyup", renderFiles);
+  document.getElementById("filterCategory").addEventListener("change", changeFilter);
+
+  document.getElementById("closeOtpBtn").onclick = closeOtp;
+  document.getElementById("sendOtpBtn").onclick = sendOtp;
+  document.getElementById("verifyOtpBtn").onclick = verifyOtp;
+  document.getElementById("resultButton").onclick = retryOtp;
+  document.getElementById("closeViewerBtn").onclick = closeViewer;
+
+  document.addEventListener("click", function(e) {
+    if (e.target.classList.contains("viewBtn")) {
+      const index = e.target.dataset.index;
+      viewFile(index);
+    }
+  });
+
+  // OTP auto input
+  document.querySelectorAll(".otp-boxes input")
+  .forEach((box, i, arr) => {
+
+    box.addEventListener("input", () => {
+      if (box.value && arr[i + 1]) arr[i + 1].focus();
+
+      let otp="";
+      arr.forEach(i=>otp+=i.value);
+
+      if(otp.length===4) verifyOtp();
+    });
+
+    box.addEventListener("keydown",(e)=>{
+      if(e.key==="Backspace" && !box.value && arr[i-1]){
+        arr[i-1].focus();
+      }
+    });
+
+  });
+
+});
+let devtoolsOpen = false;
+
+setInterval(() => {
+
+ const threshold = 160;
+
+ if (window.outerWidth - window.innerWidth > threshold ||
+     window.outerHeight - window.innerHeight > threshold) {
+
+   if(!devtoolsOpen){
+     console.warn("Developer tools detected");
+     devtoolsOpen = true;
+   }
+
+ } else {
+   devtoolsOpen = false;
+ }
+
+},1000);
+document.addEventListener("keydown",function(e){
+
+ if(
+  e.key === "F12" ||
+  (e.ctrlKey && e.shiftKey && e.key === "I") ||
+  (e.ctrlKey && e.shiftKey && e.key === "J") ||
+  (e.ctrlKey && e.key === "U")
+ ){
+  e.preventDefault();
+  alert("Developer tools blocked");
+ }
+
+});

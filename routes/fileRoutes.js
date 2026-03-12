@@ -11,15 +11,43 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, "../uploads"));
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
+
+ const safeName = path.basename(file.originalname).replace(/[^a-zA-Z0-9._-]/g,"");
+
+ cb(null, Date.now() + "-" + safeName);
+
+}
 });
 
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits:{
+ fileSize: 10 * 1024 * 1024,
+ files:1
+},
+  fileFilter:(req,file,cb)=>{
 
+    const allowed = [
+ "application/pdf",
+ "image/jpeg",
+ "image/png",
+ "application/msword",
+ "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+];
+
+const allowedExt = [".pdf",".jpg",".jpeg",".png",".doc",".docx"];
+
+const ext = path.extname(file.originalname).toLowerCase();
+
+if(!allowed.includes(file.mimetype) || !allowedExt.includes(ext)){
+ return cb(new Error("Invalid file type"));
+}
+    cb(null,true);
+  }
+});
 router.get("/", (req, res) => {
-  db.query("SELECT * FROM files", (err, result) => {
+  db.query("SELECT id,name,category,size,importance FROM files", (err, result) => {
     if (err) return res.status(500).send(err);
     res.json(result);
   });

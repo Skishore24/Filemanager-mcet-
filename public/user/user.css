@@ -185,18 +185,6 @@ button:hover{
   transform:rotate(-30deg);
   pointer-events:none;
 }
-/* Modal */
-.modal{
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.6);
-  justify-content:center;
-  align-items:center;
-}
 
 /* Card */
 .otp-card{
@@ -207,6 +195,7 @@ button:hover{
   text-align:center;
   box-shadow:0 20px 40px rgba(0,0,0,0.2);
   animation:fadeUp .35s ease;
+  position:relative;
 }
 
 @keyframes fadeUp{
@@ -333,10 +322,7 @@ button:hover{
   from{transform:scale(0.6);opacity:0}
   to{transform:scale(1);opacity:1}
 }
-/* Fix close button inside OTP */
-.otp-card{
-  position:relative;
-}
+
 
 /* Country dropdown spacing fix */
 .iti {
@@ -360,9 +346,6 @@ button:hover{
 /* Result screen spacing */
 #resultStep h3{
   margin-top:10px;
-}
-.otp-card{
-  position:relative;   /* IMPORTANT */
 }
 
 #resultStep p{
@@ -390,14 +373,7 @@ button:hover{
 .shake{
   animation:shake 0.35s;
 }
-.otp-card{
-  width:360px;
-  background:#fff;
-  padding:32px;
-  border-radius:18px;
-  text-align:center;
-  box-shadow:0 30px 60px rgba(0,0,0,0.25);
-}
+
 
 .otp-boxes input{
   width:60px;
@@ -717,6 +693,3 @@ right:25%;
   transform:scale(1.1);
 }
 
-.otp-card{
-  position:relative; /* important */
-}

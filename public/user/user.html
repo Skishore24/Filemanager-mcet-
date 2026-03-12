@@ -2,32 +2,28 @@
 <html>
 <head>
   <title>College Files</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="user.css">
-<link rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.css"/>
-
-  <style>
-.iti__flag { background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/img/flags.png"); }
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .iti__flag { background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/img/flags@2x.png"); }
-}
-</style>
-
+    href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      .iti__flag { background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/img/flags.png"); }
+      @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        .iti__flag { background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/img/flags@2x.png"); }
+      }
+    </style>
 </head>
+
 
 <body>
 
 <h2>College Files</h2>
 
 <div class="top-controls">
-  <input type="text" id="search" placeholder="Search..." onkeyup="renderFiles()">
+  <input type="text" id="search" placeholder="Search...">
 
-  <select id="filterCategory" onchange="changeFilter()">
+  <select id="filterCategory">
   <option value="All">All Categories</option>
 </select>
 
@@ -42,17 +38,17 @@ href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.
 <div id="otpModal" class="modal">
 
   <div class="otp-card">
-    <span class="close-btn" onclick="closeOtp()">✖</span>
+    <span class="close-btn" id="closeOtpBtn">✖</span>
 
     <!-- STEP 1 -->
     <div id="mobileStep">
 
-      <h3>Enter your Name and WhatsappNumber</h3>
+      <h3>Enter your Name and Whatsapp Number</h3>
       <input type="text" id="userName" placeholder="Full Name">
 
       <input id="mobileInput" type="tel" placeholder="Mobile Number">
 
-      <button class="btn-green" onclick="sendOtp()">Continue</button>
+      <button class="btn-green" id="sendOtpBtn">Continue</button>
 
     </div>
 
@@ -69,7 +65,7 @@ href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.
         <input maxlength="1">
       </div>
 
-      <button class="btn-green" onclick="verifyOtp()">Verify</button>
+      <button class="btn-green" id="verifyOtpBtn">Verify</button>
 
     </div>
 
@@ -82,7 +78,7 @@ href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.
       <h3 id="resultTitle"></h3>
       <p id="resultMessage"></p>
 
-      <button id="resultButton" onclick="retryOtp()">Try Again</button>
+      <button id="resultButton">Try Again</button>
 
     </div>
 
@@ -94,8 +90,8 @@ href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.
 <!-- Viewer -->
 <div id="viewerModal" class="modal">
   <div class="viewer-box">
-
-    <span class="close-btn" onclick="closeViewer()">✖</span>
+<span class="close-btn" id="closeViewerBtn">✖</span>
+   
 
     <!-- Banner -->
     <div class="viewer-header">
