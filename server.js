@@ -25,21 +25,42 @@ app.use(
           "https://cdnjs.cloudflare.com"
         ],
 
+        scriptSrcAttr: [
+          "'self'",
+          "'unsafe-inline'"
+        ],
+
         styleSrc: [
           "'self'",
           "'unsafe-inline'",
           "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
           "https://fonts.googleapis.com"
+        ],
+
+        fontSrc: [
+          "'self'",
+          "https://fonts.gstatic.com",
+          "https://cdnjs.cloudflare.com",
+          "data:"
         ],
 
         imgSrc: [
           "'self'",
           "data:",
           "blob:",
-          "https://cdn.jsdelivr.net"
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
+          "https://flagcdn.com",
+          "https://*.googleusercontent.com"
         ],
 
-        connectSrc:["'self'"],
+        connectSrc: [
+  "'self'",
+  "https://cdn.jsdelivr.net",
+  "https://cdnjs.cloudflare.com",
+  "https://ipapi.co"
+],
 
         workerSrc: [
           "'self'",
@@ -51,6 +72,7 @@ app.use(
 );
 app.disable("x-powered-by");
 app.use(cors());
+app.set("trust proxy", 1);
 
 /* ================= RATE LIMIT ================= */
 
@@ -63,20 +85,29 @@ const limiter = rateLimit({
 
 app.use("/api/send-otp", limiter);
 app.use("/api/verify-otp", limiter);
-app.use("/secure-files", limiter);
+app.use("/secure-files", rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 50
+}));
 app.use((req,res,next)=>{
- res.setHeader("X-Content-Type-Options","nosniff");
- res.setHeader("X-Frame-Options","SAMEORIGIN");
- next();
+  res.setHeader("Referrer-Policy","no-referrer");
+  next();
 });
 /* ================= MIDDLEWARE ================= */
 
 app.use(express.json({limit:"2mb"}));
 app.use(express.urlencoded({ extended: true, limit:"2mb" }));
+app.use("/api/auth/login", rateLimit({
+ windowMs: 15 * 60 * 1000,
+ max: 10
+}));
 
 /* ================= STATIC FILES ================= */
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public"),{
+  maxAge:"1d",
+  etag:true
+}));
 
 /* ================= ROUTES ================= */
 

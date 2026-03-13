@@ -4,7 +4,7 @@ const db = require("../db");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-
+const verifyAdmin = require("../middleware/verifyAdmin");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -12,8 +12,8 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
 
- const safeName = path.basename(file.originalname).replace(/[^a-zA-Z0-9._-]/g,"");
-
+const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g,"");
+cb(null, Date.now() + "-" + safeName);
  cb(null, Date.now() + "-" + safeName);
 
 }
@@ -22,9 +22,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits:{
- fileSize: 10 * 1024 * 1024,
- files:1
+limits:{
+ fileSize: 10 * 1024 * 1024
 },
   fileFilter:(req,file,cb)=>{
 
@@ -46,36 +45,43 @@ if(!allowed.includes(file.mimetype) || !allowedExt.includes(ext)){
     cb(null,true);
   }
 });
-router.get("/", (req, res) => {
-  db.query("SELECT id,name,category,size,importance FROM files", (err, result) => {
+router.get("/", verifyAdmin, (req, res) => {
+  db.query(
+    "SELECT id,name,category,size,importance,date FROM files",
+    (err, result) => {
     if (err) return res.status(500).send(err);
     res.json(result);
   });
 });
 
-router.post("/", upload.single("file"), (req, res) => {
+router.post("/", verifyAdmin, upload.single("file"), (req, res) => {
+
+  if(!req.file){
+    return res.status(400).json({error:"No file uploaded"});
+  }
 
   const name = req.file.filename;
   const filepath = "/uploads/" + req.file.filename;
-  const category = req.body.category;
+  const category = req.body.category || "General";
   const size = (req.file.size / 1024).toFixed(1) + " KB";
-  const importance = "less";
+  const importance = req.body.importance || "less";
 
   db.query(
     "INSERT INTO files (name, filepath, category, size, importance) VALUES (?,?,?,?,?)",
     [name, filepath, category, size, importance],
-    (err, result) => {
+    (err) => {
       if (err) return res.status(500).send(err);
       res.json({ success: true });
     }
   );
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", verifyAdmin, (req, res) => {
 
   db.query("SELECT * FROM files WHERE id=?", [req.params.id], (err, result) => {
 
-    if(result.length === 0) return res.sendStatus(404);
+  if(err) return res.status(500).send(err);
+  if(result.length === 0) return res.sendStatus(404);
 
     const file = result[0];
     const filePath = path.join(__dirname, "../uploads", file.name);
@@ -84,14 +90,17 @@ router.delete("/:id", (req, res) => {
       fs.unlinkSync(filePath);
     }
 
-    db.query("DELETE FROM files WHERE id=?", [req.params.id], () => {
-      res.json({success:true});
-    });
+    db.query("DELETE FROM files WHERE id=?", [req.params.id], (err) => {
+
+  if(err) return res.status(500).json({error:"Delete failed"});
+
+  res.json({success:true});
+});
 
   });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", verifyAdmin, (req, res) => {
   const { name, category, importance } = req.body;
   const id = req.params.id;
 
@@ -104,7 +113,7 @@ router.put("/:id", (req, res) => {
 
     // keep original extension
     const ext = path.extname(oldFile.name);
-    const safeName = name.replace(/\.[^/.]+$/, ""); 
+    const safeName = name.replace(/[^a-zA-Z0-9_-]/g,"");
     const newFileName = safeName + ext;
 
     const oldPath = path.join(__dirname, "../uploads", oldFile.name);
@@ -141,7 +150,7 @@ router.put("/:id", (req, res) => {
 });
 
 
-router.put("/importance/:id", (req, res) => {
+router.put("/importance/:id", verifyAdmin, (req, res) => {
   const { importance } = req.body;
 
   db.query(

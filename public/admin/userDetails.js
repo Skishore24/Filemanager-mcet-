@@ -14,7 +14,11 @@ if(!token || token === "null"){
   window.location.href = "/admin/login.html";
 }
 async function loadBlockedUsers(){
-  let res = await fetch("/api/users/blocked");
+  let res = await fetch("/api/users/blocked",{
+  headers:{
+    "Authorization":"Bearer " + token
+  }
+});
   let data = await res.json();
   blockedUsersList = data.map(u => u.mobile);
 }
@@ -40,8 +44,24 @@ async function loadUsers(){
 
   await loadBlockedUsers();   // add this line
 
-  let res = await fetch("/api/logs?page=1&limit=1000");
-  let data = await res.json();
+  let res = await fetch("/api/logs?page=1&limit=500",{
+    headers:{
+      "Authorization":"Bearer " + token
+    }
+  });
+
+  if(res.status === 401){
+    alert("Session expired. Please login again.");
+    localStorage.removeItem("token");
+    window.location.href="/admin/login.html";
+    return;
+  }
+  let data = {};
+    try{
+      data = await res.json();
+    }catch(e){
+      console.log("Invalid API response");
+    }
   let logs = data.logs || [];
 
   usersData = {};
@@ -174,7 +194,7 @@ let initials = name ? name.charAt(0).toUpperCase() : "U";
   document.getElementById("uName").innerText = name;
   document.getElementById("uMobile").innerText = mobile;
   document.getElementById("uVisits").innerText = popupLogs.length;
-let latestVisit = popupLogs
+let latestVisit = [...popupLogs]
   .sort((a,b)=> new Date(b.viewed_at)-new Date(a.viewed_at))[0];
 
 document.getElementById("uLastVisit").innerText =
@@ -260,7 +280,10 @@ async function blockSelected(){
   for(let mobile of mobiles){
     await fetch("/api/users/block", {
       method:"POST",
-      headers:{ "Content-Type":"application/json" },
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer " + token
+      },
       body: JSON.stringify({ mobile })
     });
   }
@@ -332,7 +355,10 @@ async function confirmAction(){
   if(confirmType === "block"){
     await fetch("/api/users/block", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization":"Bearer " + token
+      },
       body: JSON.stringify({ mobile: confirmMobile })
     });
   }
@@ -341,28 +367,28 @@ async function confirmAction(){
   if(confirmType === "delete"){
     await fetch("/api/users/delete-user-logs", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization":"Bearer " + token
+      },
       body: JSON.stringify({ mobile: confirmMobile })
     });
   }
 
   // DELETE MULTIPLE USERS
   if(confirmType === "deleteSelected"){
-
     for(let mobile of confirmMobile){
-
       await fetch("/api/users/delete-user-logs", {
         method:"POST",
-        headers:{ "Content-Type":"application/json" },
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":"Bearer " + token
+        },
         body: JSON.stringify({ mobile })
       });
-
     }
-
   }
-
   await loadBlockedUsers();
-
   closeConfirm();
   closeUserModal();
   loadUsers();
@@ -375,7 +401,11 @@ function closeConfirm(){
 /* BLOCKED MODAL */
 async function openBlockedModal(){
   try{
-    let res = await fetch("/api/users/blocked");
+    let res = await fetch("/api/users/blocked",{
+      headers:{
+        "Authorization":"Bearer " + token
+      }
+    });
     let blocked = await res.json();
 
     let table = document.getElementById("blockedTable");
@@ -409,7 +439,10 @@ async function unblockUser(mobile){
 
   await fetch("/api/users/unblock", {
     method:"POST",
-    headers:{ "Content-Type":"application/json" },
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer " + token
+    },
     body: JSON.stringify({ mobile })
   });
 
@@ -443,11 +476,9 @@ function getUserStatus(logs){
   if(!logs || logs.length === 0)
     return "offline";
 
-  // Find latest last_active
   let latestActive = logs
-    .map(l => l.last_active)
-    .filter(t => t)
-    .sort((a,b)=> new Date(b)-new Date(a))[0];
+    .map(l => l.last_active || l.viewed_at)
+    .sort((a,b)=> new Date(b) - new Date(a))[0];
 
   if(!latestActive)
     return "offline";
@@ -455,12 +486,11 @@ function getUserStatus(logs){
   let lastTime = new Date(latestActive).getTime();
   let now = Date.now();
 
-  // 15 sec online window
-  return (now-lastTime <= 15000) ? "online" : "offline";
+  return (now-lastTime <= 30000) ? "online" : "offline";
 }
 
 document.addEventListener("DOMContentLoaded", loadUsers);
-setInterval(loadUsers, 20000);  
+setInterval(loadUsers, 60000);
 
 setInterval(() => {
 
@@ -468,10 +498,13 @@ setInterval(() => {
   if(!mobile) return;
 
   fetch("/api/users/heartbeat", {
-    method: "POST",
-    headers: { "Content-Type":"application/json" },
-    body: JSON.stringify({ mobile })
-  });
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json",
+    "Authorization":"Bearer " + token
+  },
+  body: JSON.stringify({ mobile })
+});
 
 }, 5000);
 

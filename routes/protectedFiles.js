@@ -12,7 +12,7 @@ router.get("/download/:filename", async (req, res) => {
     if(!/^[a-zA-Z0-9._-]+$/.test(filename)){
  return res.status(400).send("Invalid filename");
 }
-    const mobile = req.query.mobile || "Unknown";
+    const mobile = req.query.mobile || "Admin";
     const device = req.headers["user-agent"] || "Unknown";
 
 const filePath = path.join(__dirname, "..", "uploads", filename);
@@ -38,8 +38,11 @@ res.setHeader("Cache-Control","no-store");
 /* VIEW FILE */
 router.get("/:filename", async (req, res) => {
 
- if(!req.query.mobile){
-  return res.status(403).send("Access denied");
+ const mobile = req.query.mobile || "Admin";
+
+ // allow admin access without mobile
+ if(mobile !== "Admin" && mobile.length < 10){
+    return res.status(403).send("Access denied");
  }
 
  const filename = path.basename(req.params.filename);
@@ -48,7 +51,6 @@ router.get("/:filename", async (req, res) => {
   return res.status(400).send("Invalid filename");
  }
 
- const mobile = req.query.mobile;
   try {
 
     const [rows] = await db.promise().query(

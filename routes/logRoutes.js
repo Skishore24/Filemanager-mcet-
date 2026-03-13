@@ -1,17 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const verifyAdmin = require("../middleware/verifyAdmin");
 
 /* SAVE VIEW LOG */
 router.post("/save-view", (req,res)=>{
 
   const {file,name,mobile,country,state,device} = req.body;
-
+    if(!mobile){
+    return res.status(400).json({error:"Mobile required"});
+    }
   // Get real IP here
-  const ip =
-    req.headers["x-forwarded-for"] ||
-    req.socket.remoteAddress ||
-    req.ip;
+const ip =
+req.headers["x-forwarded-for"]?.split(",")[0] ||
+req.socket.remoteAddress ||
+req.ip;
 
   db.query(
     "INSERT INTO view_logs (file_name,name,mobile,ip,country,state,device,action) VALUES (?,?,?,?,?,?,?,?)",
@@ -29,10 +32,10 @@ router.post("/save-download", (req,res)=>{
 
   const {file,name,mobile,country,state,device} = req.body;
 
-  const ip =
-    req.headers["x-forwarded-for"] ||
-    req.socket.remoteAddress ||
-    req.ip;
+ const ip =
+req.headers["x-forwarded-for"]?.split(",")[0] ||
+req.socket.remoteAddress ||
+req.ip;
 
   db.query(
     "INSERT INTO view_logs (file_name,name,mobile,ip,country,state,device,action) VALUES (?,?,?,?,?,?,?,?)",
@@ -48,14 +51,14 @@ router.post("/save-download", (req,res)=>{
 });
 
 /* GET LOGS */
-router.get("/logs", (req, res) => {
+router.get("/logs", verifyAdmin, (req, res) => {
 
   const search = req.query.search || "";
   let date = req.query.date || "";
   const category = req.query.category || "All";
 
   const page = parseInt(req.query.page) || 1;
-  const limit = 10;
+  const limit = parseInt(req.query.limit) || 10;
   const offset = (page - 1) * limit;
 
   const sort = req.query.sort === "oldest" ? "ASC" : "DESC";
@@ -93,7 +96,12 @@ router.get("/logs", (req, res) => {
     ${where}
   `;
 
-  db.query(countQuery, params, (err,countResult)=>{
+ db.query(countQuery, params, (err,countResult)=>{
+
+  if(err){
+    console.log(err);
+    return res.status(500).json({error:"DB error"});
+  }
 
     const totalRows = countResult[0].total;
     const totalPages = Math.ceil(totalRows/limit);
@@ -116,7 +124,7 @@ router.get("/logs", (req, res) => {
 
 const ExcelJS = require("exceljs");
 
-router.get("/logs/export", async (req,res)=>{
+router.get("/logs/export", verifyAdmin, async (req,res)=>{
 
   db.query("SELECT * FROM view_logs ORDER BY viewed_at DESC", async (err,rows)=>{
     if(err) return res.send("DB Error");
@@ -149,7 +157,7 @@ router.get("/logs/export", async (req,res)=>{
   });
 });
 
-router.delete("/logs/:id", (req,res)=>{
+router.delete("/logs/:id", verifyAdmin, (req,res)=>{
 
   const id = req.params.id;
 
@@ -162,7 +170,7 @@ router.delete("/logs/:id", (req,res)=>{
     }
   );
 });
-router.post("/users/delete-user-logs", (req,res)=>{
+router.post("/users/delete-user-logs", verifyAdmin, (req,res)=>{
 
   const { mobile } = req.body;
 

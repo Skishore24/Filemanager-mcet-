@@ -21,15 +21,28 @@ if(!token){
 
 let files = [];
 async function loadCategories(){
-  let res = await fetch("/api/categories");
+  let res = await fetch("/api/categories",{
+    headers:{
+      "Authorization": "Bearer " + token
+    }
+  });
   categories = await res.json();
   showCategories();
 }
 async function loadFiles(){
   try{
-    let res = await fetch("/api/files");
 
-    if(!res.ok) throw new Error("Server error");
+    let token = localStorage.getItem("token");
+
+    let res = await fetch("/api/files",{
+      headers:{
+        "Authorization": "Bearer " + token
+      }
+    });
+
+    if(!res.ok){
+      throw new Error("Server error");
+    }
 
     files = await res.json();
     showFiles();
@@ -39,7 +52,6 @@ async function loadFiles(){
     alert("Failed to load files");
   }
 }
-
 
 
 /* ADD FILE */
@@ -70,7 +82,11 @@ function downloadFile(index){
   let file = files[index];
   if(!file) return;
 
-  let mobile = localStorage.getItem("mobile") || "Unknown";
+  let mobile = localStorage.getItem("mobile");
+
+if(!mobile && isAdminPage){
+  mobile = "Admin";
+}
 
   window.location =
     "/secure-files/download/" + file.name + "?mobile=" + mobile;
@@ -138,7 +154,12 @@ function confirmBulkAction(){
     let file = files[i];
 
     if(bulkActionType === "delete"){
-      return fetch("/api/files/" + file.id,{method:"DELETE"});
+      return fetch("/api/files/" + file.id,{
+      method:"DELETE",
+      headers:{
+        "Authorization":"Bearer " + token
+      }
+    });
     }
 
     if(bulkActionType === "viewOnly" || bulkActionType === "viewDownload"){
@@ -147,7 +168,10 @@ function confirmBulkAction(){
 
       return fetch("/api/files/importance/" + file.id,{
         method:"PUT",
-        headers:{"Content-Type":"application/json"},
+        headers:{
+          "Authorization":"Bearer " + token,
+          "Content-Type":"application/json"
+        },
         body:JSON.stringify({ importance: importanceValue })
       });
     }
@@ -397,10 +421,6 @@ function closeFileConfirm(){
   document.getElementById("confirmFileModal").style.display = "none";
   deleteFileIndex = null;
 }
-function closeViewer(){
-  document.getElementById("viewerModal").style.display="none";
-  document.getElementById("viewerFrame").src="";
-}
 
 async function deleteFileConfirmed(){
 
@@ -412,7 +432,10 @@ async function deleteFileConfirmed(){
   closeViewer();   // ADD THIS
 
   await fetch("/api/files/" + file.id,{
-    method:"DELETE"
+    method:"DELETE",
+    headers:{
+      "Authorization": "Bearer " + token
+    }
   });
 
   closeFileConfirm();
@@ -432,7 +455,12 @@ function viewFile(index) {
   let viewer = document.getElementById("viewerModal");
   let frame = document.getElementById("viewerFrame");
 
-let mobile = localStorage.getItem("mobile") || "Unknown";
+let mobile = localStorage.getItem("mobile");
+
+if(isAdminPage){
+  mobile = "Admin";
+}
+
 frame.src = "/secure-files/" + file.name + "?mobile=" + mobile + "&t=" + Date.now();
 
   viewer.style.display = "flex";
@@ -494,8 +522,11 @@ function saveEdit() {
 
   fetch("/api/files/" + file.id, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization":"Bearer " + token
+      },
+  body: JSON.stringify({
       name: newName,
       category: newCategory,
       importance: newImportance
@@ -532,17 +563,17 @@ function closeFilter() {
   document.getElementById("filterModal").style.display = "none";
 }
 
+
 function applyFilter() {
+
   currentFilter = document.getElementById("filterCategory").value;
   importanceFilter = document.getElementById("filterImportance").value;
   dateFilter = document.getElementById("filterDate").value;
 
+  filePage = 1;
+
   closeFilter();
-
-  nextFilePage()
-prevFilePage()
-showFiles()
-
+  showFiles();
 }
 
 
@@ -642,7 +673,10 @@ function addCategory(){
 
 fetch("/api/categories",{
   method:"POST",
-  headers:{"Content-Type":"application/json"},
+   headers:{
+    "Content-Type":"application/json",
+    "Authorization":"Bearer " + token
+  },
   body:JSON.stringify({name})
 }).then(loadCategories);
 
@@ -665,8 +699,11 @@ function deleteCategory(){
   let cat = categories[deleteIndex];
 
   fetch("/api/categories/" + cat.id,{
-    method:"DELETE"
-  }).then(()=>{
+  method:"DELETE",
+  headers:{
+    "Authorization":"Bearer " + token
+  }
+}).then(()=>{
     deleteIndex = null;   // important
     closeConfirm();
     loadCategories();
@@ -698,7 +735,10 @@ function saveCategoryEdit(){
 
   fetch("/api/categories/" + cat.id,{
     method:"PUT",
-    headers:{"Content-Type":"application/json"},
+     headers:{
+    "Content-Type":"application/json",
+    "Authorization":"Bearer " + token
+  },
     body:JSON.stringify({ name:newName })
   }).then(loadCategories);
 
@@ -875,6 +915,9 @@ function confirmUpload(){
 
     fetch("/api/files",{
       method:"POST",
+      headers:{
+        "Authorization":"Bearer " + token
+      },
       body: formData
     }).then(()=>loadFiles());
   }
@@ -897,10 +940,13 @@ function saveManualFile(){
   let importance = document.getElementById("importance").value;
 
   fetch("/api/files",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({name,category,size,importance})
-  }).then(()=>{
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json",
+    "Authorization":"Bearer " + token
+  },
+  body:JSON.stringify({name,category,size,importance})
+}).then(()=>{
     alert("File Added");
     location.reload();
   });

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const verifyAdmin = require("../middleware/verifyAdmin");
 
 /* CHECK BLOCK */
 router.post("/check-block", (req, res) => {
@@ -16,14 +17,34 @@ router.post("/check-block", (req, res) => {
     }
   );
 });
+router.post("/offline",(req,res)=>{
 
+  const { mobile } = req.body;
+
+  if(!mobile) return res.json({success:false});
+
+  db.query(`
+    UPDATE view_logs
+    SET last_active = DATE_SUB(NOW(), INTERVAL 1 MINUTE)
+    WHERE id = (
+      SELECT id FROM (
+        SELECT id
+        FROM view_logs
+        WHERE mobile = ?
+        ORDER BY viewed_at DESC
+        LIMIT 1
+      ) AS t
+    )
+  `,[mobile],()=>res.json({success:true}));
+
+});
 /* BLOCK USER */
-router.post("/block", (req,res)=>{
+router.post("/block", verifyAdmin,(req,res)=>{
 
   const { mobile } = req.body;
 
   db.query(
-    "INSERT INTO blocked_users (mobile) VALUES (?)",
+    "INSERT IGNORE INTO blocked_users (mobile) VALUES (?)",
     [mobile],
     (err)=>{
       if(err) return res.json({success:false});
@@ -31,9 +52,9 @@ router.post("/block", (req,res)=>{
     }
   );
 });
-router.get("/blocked",(req,res)=>{
+router.get("/blocked", verifyAdmin,(req,res)=>{
   db.query("SELECT mobile FROM blocked_users",(err,result)=>{
-    if(err) return res.json([]);
+    if(err) return res.status(500).json({error:"DB error"});
     res.json(result);
   });
 });
@@ -66,7 +87,7 @@ router.post("/heartbeat", (req, res) => {
 
 
 /* UNBLOCK USER */
-router.post("/unblock", (req, res) => {
+router.post("/unblock", verifyAdmin,(req,res)=>{
   const { mobile } = req.body;
 
   db.query(

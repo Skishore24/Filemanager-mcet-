@@ -11,14 +11,19 @@ document.getElementById(step).style.display="block";
 }
 
 async function loadFiles(){
+
   try{
 
-    let res = await fetch("/api/files");
+    const token = localStorage.getItem("token");
+
+    let res = await fetch("/api/files",{
+      headers:{
+        "Authorization":"Bearer " + token
+      }
+    });
 
     if(!res.ok){
-    let text = await res.text();
-    console.error("Server error:", text);
-    return;
+      throw new Error("Failed to fetch files");
     }
 
     files = await res.json();
@@ -28,13 +33,17 @@ async function loadFiles(){
     renderFiles();
 
     // open file after files loaded
-    if(files.length > 0){
     openFileFromURL();
-    }
 
   }catch(err){
-    console.log("Error loading files", err);
+
+    console.error("Error loading files:", err);
+
+    document.getElementById("files").innerHTML =
+      "<p>Failed to load files</p>";
+
   }
+
 }
 function openFileFromURL(){
 

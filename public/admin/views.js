@@ -3,7 +3,7 @@ let currentPage = 1;
 let rowsPerPage = 10;
 let selectedLogIndex = null;
 let confirmType = "";
-let totalPages = 1;
+let logsTotalPages = 1;
 let previousModal = "";
 let sortOrder = "newest";
 let logsData = [];
@@ -41,8 +41,12 @@ let date = document.getElementById("filterDate")?.value || "";
 let category = document.getElementById("modalCategory")?.value || "All";
 
 let res = await fetch(
-`/api/logs?search=${search}&page=${currentPage}&sort=${sortOrder}&date=${date}&category=${category}`
-);
+`/api/logs?search=${search}&page=${currentPage}&sort=${sortOrder}&date=${date}&category=${category}`,
+{
+  headers:{
+    "Authorization":"Bearer " + token
+  }
+});
 
 if(!res.ok){
   alert("Failed to load logs");
@@ -52,11 +56,11 @@ if(!res.ok){
 let data = await res.json();
 
 logsData = data.logs;
-totalPages = data.totalPages || 1;
+logsTotalPages = data.totalPages || 1;
 
 document.getElementById("pageInfo").innerText =
- "Page " + currentPage + " of " + totalPages;
-
+ "Page " + currentPage + " of " + logsTotalPages;
+ 
 let table = document.getElementById("logTable");
 table.innerHTML="";
 
@@ -110,12 +114,11 @@ View
 
 }
 function nextPage(){
-  if(currentPage < totalPages){
+  if(currentPage < logsTotalPages){
     currentPage++;
     showLogs();
   }
 }
-
 
 
 function prevPage(){
@@ -191,9 +194,12 @@ async function deleteLog() {
   let log = logsData[selectedLogIndex];
   if (!log) return;
 
-  await fetch(`/api/logs/${log.id}`, {
-    method: "DELETE"
-  });
+ await fetch(`/api/logs/${log.id}`, {
+  method: "DELETE",
+  headers:{
+    "Authorization":"Bearer " + token
+  }
+});
 
   closeLogModal();
   showLogs();
@@ -217,7 +223,10 @@ async function blockSelectedUsers(){
 
     await fetch("/api/users/block", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization":"Bearer " + token
+      },
       body: JSON.stringify({ mobile })
     });
   }
@@ -235,11 +244,13 @@ async function blockSingleUser(){
   if(!selectedMobile) return;
 
   await fetch("/api/users/block", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mobile: selectedMobile })
-  });
-
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization":"Bearer " + token
+  },
+  body: JSON.stringify({ mobile: selectedMobile })
+});
   closeLogModal();
   openSuccessPopup("User blocked successfully");
 }
@@ -262,7 +273,12 @@ document.getElementById("blockedModal").classList.remove("show");
 
 async function showBlockedUsers(){
 
-  let res = await fetch("/api/users/blocked");
+  let res = await fetch("/api/users/blocked",{
+    headers:{
+      "Authorization":"Bearer " + token
+    }
+  });
+
   let blockedUsers = await res.json();
 
   let table = document.getElementById("blockedTable");
@@ -285,6 +301,7 @@ async function showBlockedUsers(){
       </tr>
     `;
   });
+
 }
 
 function getSelectedLogs(){
@@ -391,8 +408,26 @@ function loadCategories() {
 }
 
 /* Export CSV */
-function exportCSV(){
-  window.open("/api/logs/export");
+async function exportCSV(){
+
+  let res = await fetch("/api/logs/export",{
+    headers:{
+      "Authorization":"Bearer " + token
+    }
+  });
+
+  if(!res.ok){
+    alert("Export failed");
+    return;
+  }
+
+  let blob = await res.blob();
+  let url = window.URL.createObjectURL(blob);
+
+  let a = document.createElement("a");
+  a.href = url;
+  a.download = "logs.xlsx";
+  a.click();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -405,10 +440,6 @@ function toggleMenu() {
     document.querySelector(".overlay").classList.toggle("active");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadCategories();
-  showLogs();
-});
 
 function openConfirm(type) {
 
@@ -445,9 +476,12 @@ async function deleteSingleLog(){
 
   console.log("Deleting log:", log);
 
-  await fetch(`/api/logs/${log.id}`, {
-    method: "DELETE"
-  });
+ await fetch(`/api/logs/${log.id}`, {
+  method: "DELETE",
+  headers:{
+    "Authorization":"Bearer " + token
+  }
+});
 
   closeLogModal();
   showLogs();
@@ -466,11 +500,13 @@ async function confirmAction(){
 
   if(confirmType === "unblock"){
     await fetch("/api/users/unblock", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ mobile: unblockMobile })
-    });
-
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json",
+    "Authorization":"Bearer " + token
+  },
+  body: JSON.stringify({ mobile: unblockMobile })
+});
     showBlockedUsers();
     showLogs();
     openSuccessPopup("User unblocked successfully");
@@ -509,9 +545,12 @@ async function deleteSelectedLogs(){
     let log = logsData[index];
     if(!log) continue;
 
-    await fetch(`/api/logs/${log.id}`,{
-      method:"DELETE"
-    });
+await fetch(`/api/logs/${log.id}`, {
+  method: "DELETE",
+  headers:{
+    "Authorization":"Bearer " + token
+  }
+});
 
   }
 

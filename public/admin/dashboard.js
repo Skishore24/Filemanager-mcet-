@@ -1,10 +1,23 @@
-const token = localStorage.getItem("token");
+const token = localStorage.getItem("token") || "";
+window.addEventListener("beforeunload", () => {
+
+  const mobile = sessionStorage.getItem("verifiedMobile");
+  if(!mobile) return;
+
+  const data = new Blob(
+    [JSON.stringify({ mobile })],
+    { type: "application/json" }
+  );
+
+  navigator.sendBeacon("/api/users/offline", data);
+
+});
 
 if(!token || token === "null"){
   window.location.href="/admin/login.html";
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
+window.addEventListener("load", async () => {
 
   const token = localStorage.getItem("token");
 
@@ -24,7 +37,7 @@ function loadUserInfo(){
   let emailEl = document.getElementById("userEmail");
 
   // Try localStorage first
-  let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  let currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
 
   if(currentUser && emailEl){
     emailEl.innerText = currentUser.email;
@@ -35,17 +48,35 @@ function loadUserInfo(){
   let token = localStorage.getItem("token");
 
   if(!token) return;
-
   try{
     let payload = JSON.parse(atob(token.split('.')[1]));
-
-    if(emailEl){
-      emailEl.innerText = payload.email || "";
-    }
-
+    emailEl.innerText = payload.email || "";
   }catch(err){
-    console.log("Token decode error", err);
+    console.log("Invalid token");
   }
+
+}
+function animateCounter(id,value){
+
+let el=document.getElementById(id);
+
+let start=parseInt(el.innerText) || 0;
+
+let step=Math.ceil(value/30);
+
+let timer=setInterval(()=>{
+
+start+=step;
+
+if(start>=value){
+start=value;
+clearInterval(timer);
+}
+
+el.innerText=start;
+
+},20);
+
 }
 
 async function updateDashboard(){
@@ -59,19 +90,19 @@ let res = await fetch("/api/dashboard", {
 });
 
 if(!res.ok){
-  console.log("Charts API failed:", res.status);
+  console.log("Dashboard API failed:", res.status);
+  alert("Session expired. Please login again.");
+  localStorage.clear();
+  window.location.href="/admin/login.html";
   return;
 }
 
-
 let data = await res.json();
-console.log("Charts API:", data);
 
-
-    document.getElementById("totalFiles").innerText = data.totalFiles || 0;
-    document.getElementById("totalViews").innerText = data.totalViews || 0;
-    document.getElementById("totalCategories").innerText = data.totalCategories || 0;
-    document.getElementById("activeUsers").innerText = data.totalUsers || 0;
+    animateCounter("totalFiles",data.totalFiles || 0);
+    animateCounter("totalViews",data.totalViews || 0);
+    animateCounter("totalCategories",data.totalCategories || 0);
+    animateCounter("activeUsers",data.totalUsers || 0);
     document.getElementById("topFile").innerText = data.topFile || "None";
 
   } catch (err) {
@@ -300,12 +331,8 @@ function drawUsersChart(views){
   const ctx = canvas.getContext("2d");
 
   // Destroy old chart safely
-  if(window.usersChart){
-    try{
-      window.usersChart.destroy();
-    }catch(e){
-      console.log("Chart destroy error:", e);
-    }
+  if(window.usersChart && typeof window.usersChart.destroy === "function"){
+    window.usersChart.destroy();
     window.usersChart = null;
   }
 
@@ -441,8 +468,8 @@ tr.innerHTML = `
 
 
 function logoutUser(){
-  localStorage.removeItem("token");
-  window.location.href = "/admin/login.html";
+  localStorage.clear();
+  window.location.href="/admin/login.html";
 }
 
 
@@ -463,7 +490,7 @@ function closeMenu(){
 
 
 
-setInterval(updateDashboard,10000);
+setInterval(updateDashboard,5000);
 
 window.addEventListener("refreshDashboard", async ()=>{
   await updateDashboard();

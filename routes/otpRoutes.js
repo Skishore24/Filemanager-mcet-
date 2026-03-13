@@ -5,7 +5,7 @@ require("dotenv").config();
 
 let otpStore = {};
 let otpAttempts = {};
-
+let lastOtpRequest = {};
 /* TWILIO SETUP */
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -23,7 +23,11 @@ if(otpStore[mobile] && Date.now() < otpStore[mobile].expires){
  return res.json({success:false,message:"OTP already sent"});
 }
   const otp = Math.floor(1000 + Math.random() * 9000);
+if(lastOtpRequest[mobile] && Date.now() - lastOtpRequest[mobile] < 30000){
+  return res.json({success:false,message:"Wait 30 seconds"});
+}
 
+lastOtpRequest[mobile] = Date.now();
 otpStore[mobile] = {
  otp,
  expires: Date.now() + 5 * 60 * 1000

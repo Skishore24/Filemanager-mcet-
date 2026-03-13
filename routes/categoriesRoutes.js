@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const verifyAdmin = require("../middleware/verifyAdmin");
 
 /* GET categories */
 router.get("/", (req, res) => {
@@ -11,9 +12,11 @@ router.get("/", (req, res) => {
 });
 
 /* ADD category */
-router.post("/", (req, res) => {
+router.post("/", verifyAdmin, (req, res) => {
   const { name } = req.body;
-
+    if(!name || name.trim().length < 2){
+    return res.status(400).json({error:"Invalid category name"});
+    }
   db.query(
     "INSERT INTO categories (name) VALUES (?)",
     [name],
@@ -25,29 +28,25 @@ router.post("/", (req, res) => {
 });
 
 /* DELETE category */
-router.delete("/:id", (req, res) => {
+router.delete("/:id", verifyAdmin, (req,res)=>{
 
-  const id = req.params.id;
+ const id = req.params.id;
 
-  db.query(
-    "DELETE FROM categories WHERE id = ?",
-    [id],
-    (err, result) => {
+ db.query("SELECT id FROM categories WHERE id=?", [id], (err,rows)=>{
 
-      if (err) {
-        console.log("Delete Error:", err);
-        return res.status(500).json(err);
-      }
+   if(rows.length === 0){
+     return res.status(404).json({error:"Category not found"});
+   }
 
-      res.json({ success: true });
-    }
-  );
+   db.query("DELETE FROM categories WHERE id=?", [id], ()=>{
+     res.json({success:true});
+   });
+
+ });
 
 });
 
-
-module.exports = router;
-router.put("/:id", (req, res) => {
+router.put("/:id", verifyAdmin, (req, res) => {
   const { name } = req.body;
 
   db.query(
@@ -59,3 +58,5 @@ router.put("/:id", (req, res) => {
     }
   );
 });
+
+module.exports = router;
