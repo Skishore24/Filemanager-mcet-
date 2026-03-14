@@ -50,17 +50,18 @@ async function loadUsers(){
     }
   });
 
-  if(res.status === 401){
-    alert("Session expired. Please login again.");
+  if (res.status === 401) {
+    /* Session expired — redirect without blocking alert */
     localStorage.removeItem("token");
-    window.location.href="/admin/login.html";
+    window.location.href = "/admin/login.html";
     return;
   }
   let data = {};
     try{
       data = await res.json();
-    }catch(e){
-      console.log("Invalid API response");
+    } catch(e) {
+      /* Silently handle parse error — usersData stays empty */
+      console.error("Invalid API response while loading users");
     }
   let logs = data.logs || [];
 
@@ -268,48 +269,48 @@ function nextPage(){
     renderUsers();
   }
 }
-async function blockSelected(){
+async function blockSelected() {
 
-  let mobiles = getSelectedMobiles();
+  const mobiles = getSelectedMobiles();
 
-  if(mobiles.length === 0){
-    alert("Select users first");
+  if (mobiles.length === 0) {
+    openSuccessPopup("⚠️ Please select at least one user first.");
     return;
   }
 
-  for(let mobile of mobiles){
+  for (const mobile of mobiles) {
     await fetch("/api/users/block", {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization":"Bearer " + token
+      method:  "POST",
+      headers: {
+        "Content-Type":  "application/json",
+        "Authorization": "Bearer " + token
       },
       body: JSON.stringify({ mobile })
     });
   }
 
- alert("Users blocked successfully");
-await loadBlockedUsers();
-loadUsers();
+  openSuccessPopup("✅ Selected users have been blocked.");
+  await loadBlockedUsers();
+  loadUsers();
 
 }
-async function deleteSelected(){
+async function deleteSelected() {
 
-  let mobiles = getSelectedMobiles();
+  const mobiles = getSelectedMobiles();
 
-  if(mobiles.length === 0){
-    alert("Select users first");
+  if (mobiles.length === 0) {
+    openSuccessPopup("⚠️ Please select at least one user first.");
     return;
   }
 
-  confirmType = "deleteSelected";
-  confirmMobile = mobiles; // store array
+  confirmType   = "deleteSelected";
+  confirmMobile = mobiles;
 
-  document.getElementById("confirmTitle").innerText = "Delete Users";
-  document.getElementById("confirmMessage").innerText =
-    "Are you sure you want to delete selected users?";
+  document.getElementById("confirmTitle").innerText   = "Delete Users";
+  document.getElementById("confirmMessage").innerText = "Are you sure you want to delete all logs for selected users?";
 
   document.getElementById("confirmModal").style.display = "flex";
+
 }
 
 function prevPage(){ if(currentPage>1){ currentPage--; renderUsers(); } }
@@ -429,10 +430,38 @@ async function openBlockedModal(){
 
     document.getElementById("blockedModal").style.display="flex";
 
-  }catch(err){
+  } catch (err) {
     console.error("Blocked modal error:", err);
-    alert("Error loading blocked users");
+    openSuccessPopup("⚠️ Could not load blocked users. Please try again.");
   }
+}
+
+
+/* ============================================================
+   openSuccessPopup(message)
+   Shows a temporary success/info popup modal.
+   Works with the #successModal in userDetails.html.
+   Falls back to console if element is missing.
+   ============================================================ */
+function openSuccessPopup(message) {
+
+  const el = document.getElementById("successModal");
+
+  if (!el) {
+    console.info("[Popup]", message);
+    return;
+  }
+
+  const msgEl = document.getElementById("successMessage");
+  if (msgEl) msgEl.innerText = message;
+
+  el.style.display = "flex";
+
+}
+
+function closeSuccessPopup() {
+  const el = document.getElementById("successModal");
+  if (el) el.style.display = "none";
 }
 
 async function unblockUser(mobile){

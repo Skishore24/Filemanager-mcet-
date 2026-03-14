@@ -1,201 +1,255 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Dashboard</title>
 
-<link rel="stylesheet" href="dashboard.css">
-<link rel="stylesheet" href="sidebar.css">
-<link rel="icon" href="images/logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- ============================================================
+       Meta & Character Set
+       ============================================================ -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MCET File Manager — Admin Dashboard with analytics and statistics">
+  <title>Dashboard | MCET File Manager</title>
 
-<link href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css" rel="stylesheet">
+  <!-- ============================================================
+       Favicon
+       ============================================================ -->
+  <link rel="icon" href="images/logo.png" type="image/png">
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- ============================================================
+       External Fonts & Icons
+       ============================================================ -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- ============================================================
+       Map library CSS (jsvectormap — world visitor map)
+       ============================================================ -->
+  <link href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css" rel="stylesheet">
+
+  <!-- ============================================================
+       Page Stylesheets
+       ============================================================ -->
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="stylesheet" href="dashboard.css">
 
 </head>
-
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+  <!-- ============================================================
+       SIDEBAR — Fixed left navigation (shared across all admin pages)
+       ============================================================ -->
+  <nav class="sidebar" role="navigation" aria-label="Admin Navigation">
 
-<div class="logo-box">
-<img src="images/logo.png">
-</div>
+    <!-- College Logo -->
+    <div class="logo-box">
+      <img src="images/logo.png" alt="MCET College Logo">
+    </div>
 
-<div class="menu">
+    <!-- Navigation Links -->
+    <div class="menu">
 
-<a href="dashboard.html" class="active">
-<i class="fa fa-chart-line"></i> Dashboard
-</a>
+      <a href="dashboard.html" class="active" aria-current="page">
+        <i class="fa fa-chart-line" aria-hidden="true"></i> Dashboard
+      </a>
 
-<a href="manage.html">
-<i class="fa fa-folder-open"></i> Manage Files
-</a>
+      <a href="manage.html">
+        <i class="fa fa-folder-open" aria-hidden="true"></i> Manage Files
+      </a>
 
-<a href="views.html">
-<i class="fa fa-eye"></i> View Logs
-</a>
+      <a href="views.html">
+        <i class="fa fa-eye" aria-hidden="true"></i> View Logs
+      </a>
 
-<a href="userDetails.html">
-<i class="fa fa-users"></i> User Analytics
-</a>
+      <a href="userDetails.html">
+        <i class="fa fa-users" aria-hidden="true"></i> User Analytics
+      </a>
 
-</div>
+    </div><!-- end .menu -->
 
-<div class="sidebar-bottom">
+    <!-- Profile + Logout at bottom of sidebar -->
+    <div class="sidebar-bottom">
 
-<div class="profile-box">
-<img src="images/avatar.jpg" class="avatar">
-<div class="profile-info">
-<span id="userEmail"></span>
-</div>
-</div>
+      <div class="profile-box">
+        <img src="images/avatar.jpg" class="avatar" alt="Admin Avatar">
+        <div class="profile-info">
+          <!-- Email is populated by dashboard.js → loadUserInfo() -->
+          <span id="userEmail" title="Logged in user email"></span>
+        </div>
+      </div>
 
-<button class="logout-btn" onclick="logoutUser()">
-<i class="fa fa-sign-out-alt"></i> Logout
-</button>
+      <button class="logout-btn" onclick="logoutUser()" aria-label="Logout">
+        <i class="fa fa-sign-out-alt" aria-hidden="true"></i> Logout
+      </button>
 
-</div>
+    </div><!-- end .sidebar-bottom -->
 
-</div>
+  </nav><!-- end .sidebar -->
 
-<div class="overlay" onclick="closeMenu()"></div>
+  <!-- Backdrop overlay — closes sidebar on mobile tap -->
+  <div class="overlay" onclick="closeMenu()" aria-hidden="true"></div>
 
-<!-- MAIN -->
-<div class="main">
 
-<div class="topbar">
-<button onclick="toggleMenu()" class="menu-toggle">☰</button>
-<h1 class="page-title">Overview</h1>
-</div>
+  <!-- ============================================================
+       MAIN CONTENT AREA
+       ============================================================ -->
+  <main class="main" role="main">
 
-<p class="subtitle">Analytics and statistics</p>
+    <!-- ---- Top Bar (hamburger + page title) ---- -->
+    <div class="topbar">
+      <button onclick="toggleMenu()" class="menu-toggle" aria-label="Toggle navigation">
+        <i class="fa fa-bars"></i>
+      </button>
+      <h1 class="page-title">Overview</h1>
+    </div>
 
-<!-- STAT CARDS -->
+    <p class="subtitle">Real-time analytics and statistics</p>
 
-<div class="stats-row">
 
-<div class="stat-card purple">
-<div>
-<p>Total Files</p>
-<h2 id="totalFiles">0</h2>
-</div>
-<i class="fa fa-folder"></i>
-</div>
+    <!-- ============================================================
+         STAT CARDS — 5 summary counters at the top
+         Populated by dashboard.js → updateDashboard()
+         ============================================================ -->
+    <div class="stats-row" role="region" aria-label="Summary Statistics">
 
-<div class="stat-card pink">
-<div>
-<p>Total Views</p>
-<h2 id="totalViews">0</h2>
-</div>
-<i class="fa fa-eye"></i>
-</div>
+      <!-- Total Files uploaded -->
+      <div class="stat-card purple">
+        <div>
+          <p>Total Files</p>
+          <h2 id="totalFiles">0</h2>
+        </div>
+        <i class="fa fa-folder" aria-hidden="true"></i>
+      </div>
 
-<div class="stat-card green">
-<div>
-<p>Top File</p>
-<h3 id="topFile">None</h3>
-</div>
-<i class="fa fa-file"></i>
-</div>
+      <!-- Total file views logged -->
+      <div class="stat-card pink">
+        <div>
+          <p>Total Views</p>
+          <h2 id="totalViews">0</h2>
+        </div>
+        <i class="fa fa-eye" aria-hidden="true"></i>
+      </div>
 
-<div class="stat-card orange">
-<div>
-<p>Categories</p>
-<h2 id="totalCategories">0</h2>
-</div>
-<i class="fa fa-layer-group"></i>
-</div>
+      <!-- Most-viewed file -->
+      <div class="stat-card green">
+        <div>
+          <p>Top File</p>
+          <h3 id="topFile">None</h3>
+        </div>
+        <i class="fa fa-file-alt" aria-hidden="true"></i>
+      </div>
 
-<div class="stat-card blue">
-<div>
-<p>Active Users</p>
-<h2 id="activeUsers">0</h2>
-</div>
-<i class="fa fa-users"></i>
-</div>
+      <!-- Total categories -->
+      <div class="stat-card orange">
+        <div>
+          <p>Categories</p>
+          <h2 id="totalCategories">0</h2>
+        </div>
+        <i class="fa fa-layer-group" aria-hidden="true"></i>
+      </div>
 
-</div>
+      <!-- Users currently online (heartbeat in last 30s) -->
+      <div class="stat-card blue">
+        <div>
+          <p>Active Users</p>
+          <h2 id="activeUsers">0</h2>
+        </div>
+        <i class="fa fa-users" aria-hidden="true"></i>
+      </div>
 
-<!-- DASHBOARD GRID -->
+    </div><!-- end .stats-row -->
 
-<div class="dashboard-grid">
 
-<!-- ROW 1 -->
+    <!-- ============================================================
+         CHART GRID — 2-column layout with various charts
+         All charts are rendered by dashboard.js → loadCharts()
+         ============================================================ -->
+    <div class="dashboard-grid" role="region" aria-label="Analytics Charts">
 
-<div class="card">
-<h3>Performance</h3>
-<div class="chart-container">
-<canvas id="performanceChart"></canvas>
-</div>
-</div>
+      <!-- ROW 1: Performance line chart + World map -->
 
-<div class="card">
-<h3>Visitors Worldwide</h3>
-<div id="worldMap"></div>
-</div>
+      <!-- Monthly views vs downloads line chart -->
+      <div class="card">
+        <h3><i class="fa fa-chart-line"></i> Performance</h3>
+        <p class="card-sub">Monthly views &amp; downloads</p>
+        <div class="chart-container">
+          <canvas id="performanceChart" aria-label="Performance chart"></canvas>
+        </div>
+      </div>
 
-<!-- ROW 2 -->
+      <!-- World map: visitors by country -->
+      <div class="card">
+        <h3><i class="fa fa-globe"></i> Visitors Worldwide</h3>
+        <p class="card-sub">Access locations by country</p>
+        <div id="worldMap" aria-label="World visitor map"></div>
+      </div>
 
-<div class="card">
-<h3>Devices</h3>
-<div class="chart-container">
-<canvas id="deviceChart"></canvas>
-</div>
-</div>
+      <!-- ROW 2: Device doughnut chart + Top countries table -->
 
-<div class="card">
-<h3>Top Countries</h3>
-<table class="country-table">
-<tbody id="topCountries"></tbody>
-</table>
-</div>
+      <!-- Mobile vs Desktop split -->
+      <div class="card">
+        <h3><i class="fa fa-mobile-alt"></i> Devices</h3>
+        <p class="card-sub">Mobile, desktop, and other</p>
+        <div class="chart-container">
+          <canvas id="deviceChart" aria-label="Device breakdown chart"></canvas>
+        </div>
+      </div>
 
-<!-- ROW 3 -->
+      <!-- Top 10 countries by view count -->
+      <div class="card">
+        <h3><i class="fa fa-flag"></i> Top Countries</h3>
+        <p class="card-sub">Most active visitor countries</p>
+        <table class="country-table" aria-label="Top countries by views">
+          <tbody id="topCountries"></tbody>
+        </table>
+      </div>
 
-<div class="card full-width">
-<h3>Total Users Visited</h3>
-<div class="chart-container">
-<canvas id="usersChart"></canvas>
-</div>
-</div>
+      <!-- ROW 3: Monthly unique users bar chart (full width) -->
 
-<!-- ROW 4 -->
+      <div class="card full-width">
+        <h3><i class="fa fa-user-friends"></i> Total Users Visited</h3>
+        <p class="card-sub">Unique monthly visitor count</p>
+        <div class="chart-container">
+          <canvas id="usersChart" aria-label="Total users chart"></canvas>
+        </div>
+      </div>
 
-<div class="card full-width">
+      <!-- ROW 4: Recent/top users table (full width) -->
 
-<h3>Recent Users</h3>
+      <div class="card full-width">
 
-<table class="users-table">
+        <h3><i class="fa fa-clock"></i> Recent Users</h3>
+        <p class="card-sub">Top 5 most active users</p>
 
-<thead>
-<tr>
-<th>Name</th>
-<th>Mobile</th>
-<th>Visits</th>
-<th>Status</th>
-</tr>
-</thead>
+        <table class="users-table" aria-label="Recent users">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Visits</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <!-- Rows are injected by dashboard.js → loadTopUsers() -->
+          <tbody id="recentUsers"></tbody>
+        </table>
 
-<tbody id="recentUsers"></tbody>
+      </div>
 
-</table>
+    </div><!-- end .dashboard-grid -->
 
-</div>
+  </main><!-- end .main -->
 
-</div>
 
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script src="dashboard.js"></script>
+  <!-- ============================================================
+       SCRIPTS — Loaded at bottom for best performance
+       jsvectormap: world map rendering
+       chart.js: all canvas chart rendering
+       dashboard.js: data fetching and chart initialization
+       ============================================================ -->
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="dashboard.js"></script>
 
 </body>
 </html>

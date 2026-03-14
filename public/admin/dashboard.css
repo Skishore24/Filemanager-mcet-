@@ -1,28 +1,54 @@
-/* ===========================
-GLOBAL RESET
-=========================== */
+/* ============================================================
+   dashboard.css — Admin Dashboard Page Styles
+   Sections:
+   1.  Global Reset & Base
+   2.  Custom Scrollbar
+   3.  Main Content Area Layout
+   4.  Overlay (mobile backdrop)
+   5.  Top Bar & Page Title
+   6.  Subtitle Text
+   7.  Stat Cards (summary counters)
+   8.  Stat Card Color Variants
+   9.  Dashboard Grid & Card Panels
+   10. Charts
+   11. World Map
+   12. Country Table
+   13. Users Table
+   14. Online/Offline Badges
+   15. Card Sub-heading
+   16. Animations
+   17. Responsive Breakpoints
+   ============================================================ */
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:"Poppins",sans-serif;
+
+/* ============================================================
+   SECTION 1 — GLOBAL RESET & BASE
+   ============================================================ */
+
+* {
+  margin:      0;
+  padding:     0;
+  box-sizing:  border-box;
+  font-family: "Poppins", sans-serif;
 }
 
-html,body{
-overflow-x:hidden;
+html, body {
+  overflow-x: hidden;
 }
 
-body{
-background:linear-gradient(135deg,#f8fafc,#eef2ff);
-color:#1e293b;
-min-height:100vh;
-overflow-x:hidden;
+body {
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  color:      #1e293b;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* ===========================
-CUSTOM SCROLLBAR
-=========================== */
+
+/* ============================================================
+   SECTION 2 — CUSTOM SCROLLBAR
+   Purple thumb matches brand color
+   ============================================================ */
+
 
 ::-webkit-scrollbar{
 width:8px;
@@ -37,21 +63,26 @@ background:#6366f1;
 border-radius:10px;
 }
 
-/* ===========================
-MAIN LAYOUT
-=========================== */
 
-.main{
-flex:1;
-padding:20px 20px 60px 20px;
-animation:fadePage .5s ease;
-width:100%;
-max-width:100%;
+/* ============================================================
+   SECTION 3 — MAIN CONTENT AREA
+   Offset from sidebar with margin-left on desktop,
+   full-width on mobile
+   ============================================================ */
+
+.main {
+  flex:       1;
+  padding:    20px 20px 60px 20px;
+  animation:  fadePage .5s ease;
+  width:      100%;
+  max-width:  100%;
 }
 
-/* ===========================
-OVERLAY
-=========================== */
+
+/* ============================================================
+   SECTION 4 — OVERLAY (Mobile sidebar backdrop)
+   ============================================================ */
+
 
 .overlay{
 position:fixed;
@@ -66,47 +97,29 @@ backdrop-filter:blur(4px);
 display:block;
 }
 
-/* ===========================
-TOPBAR
-=========================== */
 
-.topbar{
-display:flex;
-align-items:center;
-gap:12px;
-margin-bottom:12px;
+/* ============================================================
+   SECTION 5 — TOP BAR & PAGE TITLE
+   ============================================================ */
+
+.topbar {
+  display:       flex;
+  align-items:   center;
+  gap:           12px;
+  margin-bottom: 12px;
 }
 
-.page-title{
-font-size:22px;
-font-weight:600;
-letter-spacing:.2px;
+.page-title {
+  font-size:      22px;
+  font-weight:    600;
+  letter-spacing: .2px;
 }
 
-.menu-toggle{
-display:none;
-width:38px;
-height:38px;
-background:#6366f1;
-color:white;
-border:none;
-border-radius:10px;
-font-size:20px;
-cursor:pointer;
-display:flex;
-align-items:center;
-justify-content:center;
-transition:.25s;
-}
 
-.menu-toggle:hover{
-background:#4f46e5;
-transform:scale(1.05);
-}
+/* ============================================================
+   SECTION 6 — SUBTITLE TEXT
+   ============================================================ */
 
-/* ===========================
-SUBTITLE
-=========================== */
 
 .subtitle{
 color:#64748b;
@@ -175,33 +188,34 @@ font-size:22px;
 opacity:.9;
 }
 
-/* ===========================
-STAT COLORS
-=========================== */
 
-.purple{
-background:linear-gradient(135deg,#7c3aed,#6366f1);
-}
+/* ============================================================
+   SECTION 8 — STAT CARD COLORS
+   Each card variant has a distinct gradient
+   ============================================================ */
 
-.pink{
-background:linear-gradient(135deg,#ec4899,#f43f5e);
-}
+/* Purple — Files */
+.purple { background: linear-gradient(135deg, #7c3aed, #6366f1); }
 
-.green{
-background:linear-gradient(135deg,#10b981,#14b8a6);
-}
+/* Pink — Views */
+.pink   { background: linear-gradient(135deg, #ec4899, #f43f5e); }
 
-.orange{
-background:linear-gradient(135deg,#f59e0b,#fb923c);
-}
+/* Green — Top File */
+.green  { background: linear-gradient(135deg, #10b981, #14b8a6); }
 
-.blue{
-background:linear-gradient(135deg,#3b82f6,#6366f1);
-}
+/* Orange — Categories */
+.orange { background: linear-gradient(135deg, #f59e0b, #fb923c); }
 
-/* ===========================
-DASHBOARD GRID
-=========================== */
+/* Blue — Active Users */
+.blue   { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+
+
+/* ============================================================
+   SECTION 9 — DASHBOARD GRID & CARD PANELS
+   2-column grid on desktop, 1-column on mobile.
+   .full-width spans both columns.
+   ============================================================ */
+
 
 .dashboard-grid{
 display:grid;
@@ -247,25 +261,28 @@ margin-bottom:16px;
 color:#334155;
 }
 
-/* ===========================
-CHARTS
-=========================== */
+/* ============================================================
+   SECTION 10 — CHARTS (Chart.js canvas wrappers)
+   ============================================================ */
 
-.chart-container{
-position:relative;
-width:100%;
-max-width:100%;
-height:260px;
-margin-bottom:8px;
+.chart-container {
+  position:      relative;
+  width:         100%;
+  max-width:     100%;
+  height:        260px;
+  margin-bottom: 8px;
 }
 
-canvas{
-max-width:100% !important;
+/* Prevent canvas from overflowing its container */
+canvas {
+  max-width: 100% !important;
 }
 
-/* ===========================
-WORLD MAP
-=========================== */
+
+/* ============================================================
+   SECTION 11 — WORLD MAP (jsvectormap)
+   ============================================================ */
+
 
 #worldMap{
 width:100%;
@@ -273,86 +290,88 @@ height:230px;
 max-width:100%;
 }
 
-/* ===========================
-COUNTRY TABLE
-=========================== */
 
-.country-table{
-width:100%;
-border-collapse:collapse;
+/* ============================================================
+   SECTION 12 — COUNTRY TABLE
+   ============================================================ */
+
+.country-table {
+  width:           100%;
+  border-collapse: collapse;
 }
 
-.country-table td{
-padding:10px;
-border-bottom:1px solid #e5e7eb;
-font-size:13px;
-transition:.2s;
+.country-table td {
+  padding:       10px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size:     13px;
+  transition:    .2s;
 }
 
-.country-table tr:hover{
-background:#f8fafc;
+.country-table tr:hover {
+  background: #f8fafc;
 }
 
-/* ===========================
-USERS TABLE
-=========================== */
 
-.users-table{
-width:100%;
-border-collapse:collapse;
+/* ============================================================
+   SECTION 13 — RECENT USERS TABLE
+   ============================================================ */
+
+.users-table {
+  width:           100%;
+  border-collapse: collapse;
 }
 
 .users-table th,
-.users-table td{
-padding:10px 12px;
-font-size:12px;
-border-bottom:1px solid #f1f5f9;
-text-align:left;
+.users-table td {
+  padding:       10px 12px;
+  font-size:     12px;
+  border-bottom: 1px solid #f1f5f9;
+  text-align:    left;
 }
 
-.users-table th{
-font-weight:600;
-color:#334155;
-background:#f9fafb;
+.users-table th {
+  font-weight: 600;
+  color:       #334155;
+  background:  #f9fafb;
 }
 
-.users-table tbody tr:hover{
-background:#f1f5f9;
+.users-table tbody tr:hover {
+  background: #f1f5f9;
 }
 
-/* ===========================
-USER INFO
-=========================== */
-
-.user-info{
-display:flex;
-align-items:center;
-gap:10px;
-min-width:180px;
+/* User name with avatar circle */
+.user-info {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  min-width:   180px;
 }
 
-.avatar-circle{
-width:30px;
-height:30px;
-border-radius:50%;
-background:linear-gradient(135deg,#6366f1,#7c3aed);
-color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:12px;
-font-weight:600;
+/* Colored initials circle */
+.avatar-circle {
+  width:         30px;
+  height:        30px;
+  border-radius: 50%;
+  background:    linear-gradient(135deg, #6366f1, #7c3aed);
+  color:         white;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  font-size:     12px;
+  font-weight:   600;
 }
 
-.user-info span{
-font-weight:500;
-font-size:14px;
-white-space:nowrap;
+.user-info span {
+  font-weight: 500;
+  font-size:   14px;
+  white-space: nowrap;
 }
 
-/* ===========================
-BADGES
-=========================== */
+
+/* ============================================================
+   SECTION 14 — ONLINE / OFFLINE STATUS BADGES
+   ============================================================ */
+
 
 .badge-online{
 background:#dcfce7;
@@ -370,114 +389,119 @@ border-radius:8px;
 font-size:11px;
 }
 
-/* ===========================
-ANIMATION
-=========================== */
+
+/* ============================================================
+   SECTION 15 — CARD SUB-HEADING
+   Descriptive subtitle below each chart card's h3
+   ============================================================ */
+.card-sub {
+  font-size:     12px;
+  color:         #94a3b8;
+  margin-top:    -10px;
+  margin-bottom: 14px;
+}
+
+
+/* ============================================================
+   SECTION 16 — ANIMATIONS
+   fadeUp: cards appearing from below on page load
+   fadePage: full page fade-in
+   ============================================================ */
 
 .card,
-.stat-card{
-animation:fadeUp .45s ease;
+.stat-card {
+  animation: fadeUp .45s ease;
 }
 
-@keyframes fadeUp{
-from{
-opacity:0;
-transform:translateY(12px);
-}
-to{
-opacity:1;
-transform:translateY(0);
-}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes fadePage{
-from{opacity:0;}
-to{opacity:1;}
+@keyframes fadePage {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-/* ===========================
-DESKTOP
-=========================== */
 
-@media(min-width:901px){
+/* ============================================================
+   SECTION 17 — RESPONSIVE BREAKPOINTS
+   ============================================================ */
 
-body{
-display:flex;
-}
+/* Desktop: body becomes flex, main gets left margin for sidebar */
+@media (min-width: 901px) {
 
-.main{
-margin-left:250px;
-width:calc(100% - 250px);
-max-width:calc(100% - 250px);
-}
+  body {
+    display: flex;
+  }
+
+  .main {
+    margin-left: 250px;
+    width:       calc(100% - 250px);
+    max-width:   calc(100% - 250px);
+  }
 
 }
 
-/* ===========================
-TABLET
-=========================== */
+/* Tablet: single-column grid, shorter chart containers */
+@media (max-width: 900px) {
 
-@media(max-width:900px){
+  .main {
+    padding: 18px;
+  }
 
-.main{
-padding:18px;
-}
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
 
-.dashboard-grid{
-grid-template-columns:1fr;
-gap:18px;
-}
-
-.chart-container{
-height:200px;
-}
+  .chart-container {
+    height: 200px;
+  }
 
 }
 
-/* ===========================
-MOBILE
-=========================== */
+/* Mobile: 2-column stat grid, compressed cards */
+@media (max-width: 480px) {
 
-@media(max-width:480px){
+  .main {
+    padding: 16px;
+  }
 
-.main{
-padding:16px;
-}
+  .stats-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
 
-.stats-row{
-grid-template-columns:1fr 1fr;
-gap:10px;
-}
+  .stat-card {
+    padding: 12px;
+  }
 
-.stat-card{
-padding:12px;
-}
+  .stat-card h2 {
+    font-size: 16px;
+  }
 
-.stat-card h2{
-font-size:16px;
-}
+  .card {
+    padding: 14px;
+  }
 
-.card{
-padding:14px;
-}
+  .chart-container {
+    height: 180px;
+  }
 
-.chart-container{
-height:180px;
-}
+  #worldMap {
+    height: 180px;
+  }
 
-#worldMap{
-height:180px;
-}
+  .dashboard-grid {
+    gap: 16px;
+    margin-bottom: 60px;
+  }
 
-.dashboard-grid{
-gap:16px;
-margin-bottom:60px;
-}
+  .users-table th,
+  .users-table td {
+    font-size: 10px;
+    padding:   6px;
+  }
 
-.users-table th,
-.users-table td{
-font-size:10px;
-padding:6px;
-}
-
-}
+}

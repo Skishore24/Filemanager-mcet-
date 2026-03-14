@@ -36,22 +36,23 @@ function getFileIcon(fileName) {
 }
 async function showLogs(){
 
-let search = document.getElementById("searchLogs").value || "";
-let date = document.getElementById("filterDate")?.value || "";
-let category = document.getElementById("modalCategory")?.value || "All";
+  const search   = document.getElementById("searchLogs").value || "";
+  const date     = document.getElementById("filterDate")?.value || "";
+  const category = document.getElementById("modalCategory")?.value || "All";
 
-let res = await fetch(
-`/api/logs?search=${search}&page=${currentPage}&sort=${sortOrder}&date=${date}&category=${category}`,
-{
-  headers:{
-    "Authorization":"Bearer " + token
+  const res = await fetch(
+    `/api/logs?search=${search}&page=${currentPage}&sort=${sortOrder}&date=${date}&category=${category}`,
+    { headers: { "Authorization": "Bearer " + token } }
+  );
+
+  if (!res.ok) {
+    /* Show inline error in table instead of blocking alert() */
+    document.getElementById("logTable").innerHTML =
+      `<tr><td colspan="7" style="text-align:center;padding:30px;color:#ef4444;">
+        <i class="fa fa-exclamation-circle"></i> Failed to load logs. Please refresh the page.
+       </td></tr>`;
+    return;
   }
-});
-
-if(!res.ok){
-  alert("Failed to load logs");
-  return;
-}
 
 let data = await res.json();
 
@@ -208,10 +209,11 @@ async function deleteLog() {
 
 async function blockSelectedUsers(){
 
-  let selected = getSelectedLogs();
+  const selected = getSelectedLogs();
 
-  if(selected.length === 0){
-    alert("Select logs first");
+  if (selected.length === 0) {
+    /* No alert — show feedback in the bulk-actions bar itself */
+    openSuccessPopup("⚠️ Please select at least one log first.");
     return;
   }
 
@@ -318,20 +320,32 @@ function getSelectedLogs(){
 
 function unblockUser(index) {
 
-    let blockedUsers = JSON.parse(localStorage.getItem("blockedUsers")) || [];
-    let mobile = blockedUsers[index];
+    /* This function is called from the blocked users list (not used in new flow) */
+    /* Real unblock is handled via confirmUnblock() → confirmAction() */
+    if (typeof index === "string") {
+      /* Called with mobile string directly */
+      unblockMobile = index;
+      confirmType = "unblock";
+      document.getElementById("confirmActionModal").classList.add("show");
+      return;
+    }
 
-    fetch("/unblock-user", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ mobile })
-        })
-        .then(() => {
-            openSuccessPopup("User unblocked successfully");
-            openBlockedModal();
-        });
+    const blockedUsers = JSON.parse(localStorage.getItem("blockedUsers")) || [];
+    const mobile = blockedUsers[index];
+
+    /* Fixed: use /api/users/unblock instead of /unblock-user */
+    fetch("/api/users/unblock", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ mobile })
+    })
+    .then(() => {
+        openSuccessPopup("User unblocked successfully");
+        openBlockedModal();
+    });
 
 }
 
@@ -392,19 +406,32 @@ function renderFilteredLogs(data){
 }
 
 /* Categories */
-function loadCategories() {
+/* Fixed: fetch from /api/categories instead of reading broken localStorage */
+async function loadCategories() {
 
-    let select = document.getElementById("modalCategory");
-    let files = JSON.parse(localStorage.getItem("files")) || [];
+    try {
 
-    let categories = [...new Set(files.map(f => f.category))];
+        const res        = await fetch("/api/categories", {
+            headers: { "Authorization": "Bearer " + token }
+        });
+        const categories = await res.json();
+        const select     = document.getElementById("modalCategory");
 
-    categories.forEach(cat => {
-        let opt = document.createElement("option");
-        opt.value = cat;
-        opt.textContent = cat;
-        select.appendChild(opt);
-    });
+        if (!select) return;
+
+        select.innerHTML = `<option value="All">All Categories</option>`;
+
+        categories.forEach(cat => {
+            const opt       = document.createElement("option");
+            opt.value       = cat.name;
+            opt.textContent = cat.name;
+            select.appendChild(opt);
+        });
+
+    } catch (err) {
+        console.error("Failed to load categories for filter:", err);
+    }
+
 }
 
 /* Export CSV */
@@ -416,8 +443,8 @@ async function exportCSV(){
     }
   });
 
-  if(!res.ok){
-    alert("Export failed");
+  if (!res.ok) {
+    openSuccessPopup("⚠️ Export failed. Please try again.");
     return;
   }
 
@@ -474,9 +501,7 @@ async function deleteSingleLog(){
   let log = logsData[selectedLogIndex];
   if(!log) return;
 
-  console.log("Deleting log:", log);
-
- await fetch(`/api/logs/${log.id}`, {
+  await fetch(`/api/logs/${log.id}`, {
   method: "DELETE",
   headers:{
     "Authorization":"Bearer " + token

@@ -1,115 +1,154 @@
+/* ============================================================
+   public/admin/dashboard.js — Admin Dashboard Page Logic
+   Handles:
+   - Auth guard (redirect to login if no token)
+   - Loading dashboard summary stats
+   - Loading and rendering all charts (line, doughnut, bar, world map)
+   - Polling stats every 30 seconds (pauses when tab is hidden)
+   ============================================================ */
+
+/* ---- Read token from localStorage before anything else ----- */
 const token = localStorage.getItem("token") || "";
+
+/* ---- Mark user as offline when browser tab is closed ------- */
 window.addEventListener("beforeunload", () => {
 
   const mobile = sessionStorage.getItem("verifiedMobile");
-  if(!mobile) return;
+  if (!mobile) return;
 
+  /* Use sendBeacon — works even when the page is closing */
   const data = new Blob(
     [JSON.stringify({ mobile })],
     { type: "application/json" }
   );
-
   navigator.sendBeacon("/api/users/offline", data);
 
 });
 
-if(!token || token === "null"){
-  window.location.href="/admin/login.html";
+/* ---- Auth guard — immediate redirect if not logged in ------ */
+if (!token || token === "null") {
+  window.location.href = "/admin/login.html";
 }
 
+/* ---- On page load: verify token, then load all data -------- */
 window.addEventListener("load", async () => {
 
-  const token = localStorage.getItem("token");
+  const tok = localStorage.getItem("token");
 
-  if(!token || token === "null"){
-    window.location.href="/admin/login.html";
+  if (!tok || tok === "null") {
+    window.location.href = "/admin/login.html";
     return;
   }
 
-  loadUserInfo();
-  await updateDashboard();
-  await loadCharts();
+  loadUserInfo();           /* Show admin email in header   */
+  await updateDashboard();  /* Load summary stat cards      */
+  await loadCharts();       /* Load all chart visualizations */
+
 });
 
 
-function loadUserInfo(){
+/* ============================================================
+   loadUserInfo()
+   Displays the logged-in admin's email in the page header.
+   Tries localStorage first, then falls back to decoding the JWT.
+   ============================================================ */
+function loadUserInfo() {
 
-  let emailEl = document.getElementById("userEmail");
+  const emailEl = document.getElementById("userEmail");
 
-  // Try localStorage first
-  let currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  /* Try to get user info from localStorage (set on login) */
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
 
-  if(currentUser && emailEl){
+  if (currentUser && emailEl) {
     emailEl.innerText = currentUser.email;
     return;
   }
 
-  // Fallback → JWT token
-  let token = localStorage.getItem("token");
+  /* Fallback: decode email directly from the JWT payload */
+  const tok = localStorage.getItem("token");
+  if (!tok) return;
 
-  if(!token) return;
-  try{
-    let payload = JSON.parse(atob(token.split('.')[1]));
-    emailEl.innerText = payload.email || "";
-  }catch(err){
-    console.log("Invalid token");
-  }
-
-}
-function animateCounter(id,value){
-
-let el=document.getElementById(id);
-
-let start=parseInt(el.innerText) || 0;
-
-let step=Math.ceil(value/30);
-
-let timer=setInterval(()=>{
-
-start+=step;
-
-if(start>=value){
-start=value;
-clearInterval(timer);
-}
-
-el.innerText=start;
-
-},20);
-
-}
-
-async function updateDashboard(){
   try {
-let token = localStorage.getItem("token");
-
-let res = await fetch("/api/dashboard", {
-  headers: {
-    "Authorization": "Bearer " + token
+    const payload = JSON.parse(atob(tok.split(".")[1]));
+    if (emailEl) emailEl.innerText = payload.email || "";
+  } catch (err) {
+    /* Silently ignore malformed tokens */
   }
-});
 
-if(!res.ok){
-  console.log("Dashboard API failed:", res.status);
-  alert("Session expired. Please login again.");
-  localStorage.clear();
-  window.location.href="/admin/login.html";
-  return;
 }
 
-let data = await res.json();
 
-    animateCounter("totalFiles",data.totalFiles || 0);
-    animateCounter("totalViews",data.totalViews || 0);
-    animateCounter("totalCategories",data.totalCategories || 0);
-    animateCounter("activeUsers",data.totalUsers || 0);
+/* ============================================================
+   animateCounter(id, value)
+   Animates a number counting up from its current value to target.
+   Used to animate the stat cards on load.
+   ============================================================ */
+function animateCounter(id, value) {
+
+  let el    = document.getElementById(id);
+  let start = parseInt(el.innerText) || 0;
+  let step  = Math.ceil(value / 30);
+
+  let timer = setInterval(() => {
+
+    start += step;
+
+    if (start >= value) {
+      start = value;
+      clearInterval(timer);
+    }
+
+    el.innerText = start;
+
+  }, 20);
+
+}
+
+
+/* ============================================================
+   updateDashboard()
+   Fetches summary stats from /api/dashboard and updates the
+   stat cards at the top of the page with animated counters.
+   Redirects to login if the session has expired.
+   ============================================================ */
+async function updateDashboard() {
+  try {
+
+    const tok = localStorage.getItem("token");
+
+    const res = await fetch("/api/dashboard", {
+      headers: { "Authorization": "Bearer " + tok }
+    });
+
+    if (!res.ok) {
+      /* Session expired or token invalid — force re-login */
+      alert("Session expired. Please login again.");
+      localStorage.clear();
+      window.location.href = "/admin/login.html";
+      return;
+    }
+
+    const data = await res.json();
+
+    /* Update stat card counters with animation */
+    animateCounter("totalFiles",      data.totalFiles      || 0);
+    animateCounter("totalViews",      data.totalViews      || 0);
+    animateCounter("totalCategories", data.totalCategories || 0);
+    animateCounter("activeUsers",     data.totalUsers      || 0);
     document.getElementById("topFile").innerText = data.topFile || "None";
 
   } catch (err) {
-    console.log("Dashboard load error", err);
+    console.error("Dashboard load error:", err.message);
   }
 }
-function loadTopUsers(users){
+
+
+/* ============================================================
+   loadTopUsers(users)
+   Renders the top 5 active users table on the dashboard.
+   Shows online/offline badge based on last_active timestamp.
+   ============================================================ */
+function loadTopUsers(users) {
   const tbody = document.getElementById("recentUsers");
   tbody.innerHTML = "";
 
@@ -159,45 +198,56 @@ tr.innerHTML = `
   });
 }
 
-async function loadCharts(){
-  console.log("loadCharts called");   // add this
-  try{
+/* ============================================================
+   loadCharts()
+   Fetches all chart data from /api/dashboard/charts and
+   renders each chart section on the dashboard.
+   ============================================================ */
+async function loadCharts() {
 
-let token = localStorage.getItem("token");
+  try {
 
-let res = await fetch("/api/dashboard/charts", {
-  headers: {
-    "Authorization": "Bearer " + token
-  }
-});
+    const tok = localStorage.getItem("token");
 
+    const res = await fetch("/api/dashboard/charts", {
+      headers: { "Authorization": "Bearer " + tok }
+    });
 
-    if(!res.ok){
-      console.log("API error");
+    if (!res.ok) {
+      console.error("Charts API error:", res.status);
       return;
     }
 
-    let data = await res.json();
-if(data.performance) drawPerformanceChart(data.performance);
+    const data = await res.json();
 
-    if(data.devices) drawDeviceChart(data.devices);
-if(data.views && data.views.length){
-  drawUsersChart(data.views);
-}else{
-  console.log("Users chart: no data");
-}
-  setTimeout(()=>{
-    drawWorldMap(data.countries || []);
-    loadTopCountries(data.countries || []);
-  },200);
+    if (data.performance) drawPerformanceChart(data.performance);
+    if (data.devices)     drawDeviceChart(data.devices);
 
-if(data.topUsers) loadTopUsers(data.topUsers);
+    if (data.views && data.views.length) {
+      drawUsersChart(data.views);
+    }
 
-  }catch(err){
-    console.log("Chart load error:", err);
+    /* Small delay to allow DOM to settle before rendering the map */
+    setTimeout(() => {
+      drawWorldMap(data.countries  || []);
+      loadTopCountries(data.countries || []);
+    }, 200);
+
+    if (data.topUsers) loadTopUsers(data.topUsers);
+
+  } catch (err) {
+    console.error("Chart load error:", err.message);
   }
+
 }
-function drawPerformanceChart(data){
+
+
+/* ============================================================
+   drawPerformanceChart(data)
+   Renders the monthly views vs downloads line chart.
+   Uses gradient fill under each line for a premium look.
+   ============================================================ */
+function drawPerformanceChart(data) {
 
   data = fillMissingMonths(data,"performance");
 
@@ -488,9 +538,34 @@ function closeMenu(){
 
 
 
-setInterval(updateDashboard,5000);
+/* ================= POLLING — stops when tab is hidden ================= */
+let pollInterval = null;
+
+function startDashboardPoll() {
+  if (pollInterval) return;
+  pollInterval = setInterval(() => {
+    if (!document.hidden) updateDashboard();
+  }, 30000); // 30s is sufficient for a live dashboard
+}
+
+function stopDashboardPoll() {
+  clearInterval(pollInterval);
+  pollInterval = null;
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    stopDashboardPoll();
+  } else {
+    updateDashboard(); // immediate refresh when admin returns
+    startDashboardPoll();
+  }
+});
+
+startDashboardPoll();
 
 window.addEventListener("refreshDashboard", async ()=>{
   await updateDashboard();
   await loadCharts();
 });
+

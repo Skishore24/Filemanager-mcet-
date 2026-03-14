@@ -1,732 +1,870 @@
-*{
-  font-family:"Poppins",sans-serif;
-  box-sizing:border-box;
-}
-img{
-max-width:100%;
-display:block;
-}
-
-body{
-  background:#f4f6fb;
-  padding:30px;
-}
-
-h2{ margin-bottom:15px; }
-
-.top-controls{
-  display:flex;
-  gap:15px;
-  margin-bottom:20px;
-}
-
-#search, select{
-  padding:10px;
-  border:1px solid #ddd;
-  border-radius:8px;
-}
-
-.file-grid{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-gap:20px;
-align-items:stretch;
-}
-
-.card{
-  background:white;
-  flex-direction:column;
-  justify-content:space-between;
-  padding:18px;
-  display:flex;
-  border-radius:14px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.08);
-  transition:.25s;
-}
-
-.card:hover{
-  transform:translateY(-6px);
-}
-
-
-button:not(.btn-green){
-  background:#ff5430;
-  margin-top:12px;
-  color:white;
-  border:none;
-  padding:8px 14px;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-button:hover{
-  background:#ff2a00;
-}
-
-/* Modal */
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.5);
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-  backdrop-filter:blur(6px);
-}
-.download-btn{
-  position:absolute;
-  bottom:20px;
-  right:20px;
-  width:auto;              /* important */
-  padding:10px 18px;
-  border-radius:30px;
-  background:#22c55e;
-  color:white;
-  font-weight:500;
-  cursor:pointer;
-  box-shadow:0 6px 18px rgba(0,0,0,0.25);
-  z-index:10;
-}
-
-.download-btn:hover{
-  transform:scale(1.05);
-  box-shadow:0 12px 25px rgba(0,0,0,0.3);
-}
-
-/* OTP CARD */
-.otp-card-modern{
-  width:360px;
-  background:white;
-  padding:30px;
-  border-radius:18px;
-  text-align:center;
-  box-shadow:0 20px 50px rgba(0,0,0,0.2);
-  animation:fadeUp .35s ease;
-}
-
-@keyframes fadeUp{
-  from{transform:translateY(20px);opacity:0}
-  to{transform:translateY(0);opacity:1}
-}
-
-.otp-card-modern input{
-  width:100%;
-  padding:12px;
-  margin-bottom:15px;
-  border-radius:10px;
-  border:1px solid #e5e7eb;
-}
-
-.primary-btn{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  background:linear-gradient(135deg,#6366f1,#7c3aed);
-  color:white;
-  cursor:pointer;
-}
-
-
-
-.success{
-  color:#10b981;
-}
-
-
-/* Viewer */
-.viewer-box{
-width:85%;
-height:90%;
-background:white;
-border-radius:12px;
-position:relative;
-display:flex;
-flex-direction:column;
-overflow:hidden;
-}
-
-.viewer-box iframe{
-  width:100%;
-  height:100%;
-  border:none;
-}
-
-.close-btn{
-  position:absolute;
-  top:12px;
-  right:14px;
-  font-size:20px;
-  cursor:pointer;
-  color:#666;
-  transition:0.2s;
-}
-
-.close-btn:hover{
-  color:#000;
-  transform:scale(1.1);
-}
-
-
-.watermark{
-  position:absolute;
-  top:40%;
-  left:25%;
-  font-size:40px;
-  color:rgba(0,0,0,0.15);
-  transform:rotate(-30deg);
-  pointer-events:none;
-}
-
-/* Card */
-.otp-card{
-  width:320px;
-  max-width:90%;
-  background:#fff;
-  padding:30px;
-  border-radius:16px;
-  text-align:center;
-  box-shadow:0 20px 40px rgba(0,0,0,0.2);
-  animation:fadeUp .35s ease;
-  position:relative;
-}
-
-@keyframes fadeUp{
-  from{transform:translateY(20px);opacity:0}
-  to{transform:translateY(0);opacity:1}
-}
-
-.otp-card h3{
-margin-bottom:20px;
-font-size:20px;
-font-weight:600;
-}
-.sub{
-font-size:14px;
-color:#6b7280;
-margin-bottom:18px;
-}
-
-.otp-card input{
-width:100%;
-padding:12px 14px;
-margin-bottom:16px;
-border-radius:10px;
-border:1px solid #e5e7eb;
-font-size:14px;
-background:#fafafa;
-}
-#verifyOtpBtn{
-transition:0.2s;
-}
-.otp-card input:focus{
-outline:none;
-border-color:#25D366;
-box-shadow:0 0 0 2px rgba(37,211,102,0.15);
-background:white;
-}
-/* Green WhatsApp button */
-.btn-green{
-width:100%;
-padding:12px;
-background:#2ecc71;
-color:white;
-border:none;
-border-radius:8px;
-font-size:16px;
-cursor:pointer;
-}
-
-.btn-green:hover{
-  background:#1ebe5d;
-  transform:translateY(-1px);
-}
-.otp-card input{
-transition:0.2s;
-}
-.ui-message{
-background:#fee2e2;
-color:#b91c1c;
-padding:8px 12px;
-border-radius:8px;
-font-size:13px;
-margin-bottom:12px;
-display:none;
-text-align:left;
-}
-.otp-boxes{
-display:flex;
-justify-content:center;
-gap:10px;
-margin:20px 0;
-}
-
-.otp-boxes input{
-width:45px;
-height:45px;
-font-size:20px;
-text-align:center;
-border-radius:8px;
-border:1px solid #ccc;
-}
-
-.otp-boxes input:focus{
-border-color:#25D366;
-box-shadow:0 0 0 2px rgba(37,211,102,0.2);
-}
-/* FIX LABEL ALIGNMENT */
-.otp-card label{
-display:block;
-text-align:left;
-font-size:14px;
-font-weight:500;
-margin-bottom:6px;
-color:#374151;
-}
-.iti{
-margin-bottom:16px;
-}
-.iti__flag { 
-  background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/img/flags.png"); 
-}
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .iti__flag { background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/img/flags@2x.png"); }
-}
-
-/* Success */
-.success-icon{
-  font-size:40px;
-  color:#25D366;
-  margin-bottom:10px;
-}
-
-
-/* Circle Icon */
-.result-icon{
-  width:80px;
-  height:80px;
-  border-radius:50%;
-  margin:15px auto;
-  position:relative;
-  animation:pop .4s ease;
-}
-
-/* Success */
-.result-icon.success{
-  background:#22c55e;
-}
-.result-icon.success::after{
-  content:"✔";
-  color:white;
-  font-size:36px;
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-}
-
-/* Error */
-.result-icon.error{
-  background:#ef4444;
-}
-.result-icon.error::after{
-  content:"✖";
-  color:white;
-  font-size:36px;
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-}
-
-/* Button */
-#resultButton{
-  display:block;
-  margin:15px auto;
-  background:#ef4444;
-  color:white;
-  border:none;
-  padding:10px 18px;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.ui-message.success{
-  color:#22c55e;
-}
-
-.ui-message.error{
-  color:#ef4444;
-}
-
-.ui-error{
-  color:#ef4444;
-  font-size:13px;
-  margin-top:8px;
-  display:none;
-}
-/* Animation */
-@keyframes pop{
-  from{transform:scale(0.6);opacity:0}
-  to{transform:scale(1);opacity:1}
-}
-
-
-/* Country dropdown spacing fix */
-.iti {
-  width:100%;
-}
-
-.iti input {
-  width:100%;
-  height:45px;
-  border-radius:10px;
-}
-.iti__selected-flag {
-  border-radius:8px 0 0 8px;
-  background:#f9fafb;
-}
-
-.iti--separate-dial-code .iti__selected-dial-code {
-  font-weight:500;
-}
-
-/* Result screen spacing */
-#resultStep h3{
-  margin-top:10px;
-}
-
-#resultStep p{
-  font-size:14px;
-  color:#6b7280;
-}
-
-/* Smooth modal animation */
-.modal{
-  animation:fadeIn .25s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0}
-  to{opacity:1}
-}
-@keyframes shake{
-  0%{transform:translateX(0)}
-  25%{transform:translateX(-6px)}
-  50%{transform:translateX(6px)}
-  75%{transform:translateX(-6px)}
-  100%{transform:translateX(0)}
-}
-#resultStep{
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-text-align:center;
-gap:10px;
-}
-.shake{
-  animation:shake 0.35s;
-}
-
-
-
-
-.result-icon.success{
-  background:#22c55e;
-  animation:pop 0.4s ease;
-}
-
-/* Banner */
-.viewer-header{
-  width:100%;
-  flex-shrink:0;
-  background:white;
-  border-bottom:1px solid #eee;
-}
-
-.viewer-header img{
-  width:100%;
-  height:70px;
-  object-fit:contain;
-}
-
-/* PDF area fills remaining space */
-.viewer-box iframe{
-  flex:1;
-  width:100%;
-  border:none;
-}
-
-/* Close button */
-.close-btn{
-  position:absolute;
-  top:16px;
-  right:16px;
-  z-index:10;
-  cursor:pointer;
-  font-size:18px;
-}
-
-/* Download button */
-.download-btn{
-  position:absolute;
-  bottom:18px;
-  right:18px;
-  padding:10px 18px;
-  border-radius:30px;
-  background:#22c55e;
-  color:white;
-  border:none;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(0,0,0,0.25);
-}
-
-/* Watermark container */
-.watermarks{
-position:absolute;
-top:70px;
-left:0;
-width:100%;
-height:calc(100% - 70px);
-pointer-events:none;
-z-index:5;
-}
-
-/* Watermark style */
-.wm{
-position:absolute;
-color:rgba(0,0,0,0.18);
-font-weight:bold;
-transform:rotate(-28deg);
-user-select:none;
-}
-
-/* Laptop size */
-.wm{
-font-size:50px;
-}
-
-/* Positions (same as mobile) */
-
-.wm1{
-top:15%;
-left:10%;
-}
-
-.wm2{
-top:55%;
-left:20%;
-}
-
-.wm3{
-top:30%;
-right:30%;
-}
-
-.wm4{
-bottom:10%;
-right:25%;
-}
-#pdfContainer {
-  flex: 1;
-  width: 100%;
-  overflow: auto;
-  padding: 20px;
-  background: #f9fafb;
-}
-
-@keyframes pop{
-  0%{transform:scale(0.6);opacity:0}
-  100%{transform:scale(1);opacity:1}
-}
+/* ============================================================
+   user.css — Student File Viewer Portal Styles
+   Sections:
+   1.  CSS Custom Properties (Design Tokens)
+   2.  Reset & Base
+   3.  Page Header (logo + search)
+   4.  Category Filter Bar & Tabs
+   5.  Files Grid & File Cards
+   6.  File Card Hover & Badges
+   7.  OTP Modal (overlay + modal box)
+   8.  OTP Step UI (inputs, timer, buttons)
+   9.  File Viewer Modal
+   10. Viewer Header & Controls
+   11. Watermark Overlay
+   12. Security Restrictions (no select, no print)
+   13. Animations & Transitions
+   14. Responsive Breakpoints
+   ============================================================ */
+
+
+/* ============================================================
+   SECTION 1 — CSS CUSTOM PROPERTIES (Design Tokens)
+   Change these to retheme the entire user portal at once
+   ============================================================ */
+:root {
+  --brand:        #6366f1;          /* Primary brand purple/indigo */
+  --brand-dark:   #4f46e5;          /* Darker brand for hover states */
+  --brand-alt:    #ec4899;          /* Accent pink                  */
+  --text-primary: #111827;          /* Near-black body text         */
+  --text-muted:   #6b7280;          /* Grey helper text             */
+  --bg-page:      #f6f8fc;          /* Page background              */
+  --card-bg:      #ffffff;          /* File card background         */
+  --border:       #e5e7eb;          /* Input / card borders         */
+  --radius:       14px;             /* Standard border-radius       */
+  --shadow-card:  0 4px 18px rgba(99, 102, 241, 0.08);
+}
+
+
+/* ============================================================
+   SECTION 2 — RESET & BASE
+   ============================================================ */
+*,
+*::before,
+*::after {
+  margin:     0;
+  padding:    0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background:  var(--bg-page);
+  color:       var(--text-primary);
+  min-height:  100vh;
+  overflow-x:  hidden;
+}
+
+/* Custom scrollbar — matches brand color */
+::-webkit-scrollbar       { width: 7px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: var(--brand); border-radius: 10px; }
+
+
+/* ============================================================
+   SECTION 3 — PAGE HEADER
+   Sticky header with logo, title, and search box
+   ============================================================ */
+.page-header {
+  position:        sticky;
+  top:             0;
+  z-index:         100;
+  background:      rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom:   1px solid var(--border);
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         14px 24px;
+  gap:             16px;
+  flex-wrap:       wrap;
+}
+
+/* Logo + college name */
+.header-brand {
+  display:     flex;
+  align-items: center;
+  gap:         12px;
+}
+
+.header-logo {
+  width:  44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.header-title {
+  font-size:   20px;
+  font-weight: 700;
+  color:       var(--text-primary);
+  line-height: 1.2;
+}
 
-/* =========================
-   TABLET RESPONSIVE
-========================= */
-@media (max-width:900px){
+.header-sub {
+  font-size: 12px;
+  color:     var(--text-muted);
+}
 
-  body{
-    padding:20px;
+/* Search box */
+.search-box {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  background:  #f9fafb;
+  border:      1.5px solid var(--border);
+  border-radius: 10px;
+  padding:     9px 14px;
+  flex:        1;
+  max-width:   360px;
+}
+
+.search-box i {
+  color:     var(--text-muted);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.search-box input {
+  border:     none;
+  outline:    none;
+  background: transparent;
+  font-size:  14px;
+  color:      var(--text-primary);
+  width:      100%;
+  font-family: "Poppins", sans-serif;
+}
+
+
+/* ============================================================
+   SECTION 4 — CATEGORY FILTER BAR
+   Horizontal scroll bar of category pill buttons
+   ============================================================ */
+.category-bar {
+  position:   sticky;
+  top:        73px;  /* Below the header */
+  z-index:    90;
+  background: rgba(246, 248, 252, 0.95);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+  padding:    10px 24px;
+}
+
+.category-tabs {
+  display:          flex;
+  gap:              8px;
+  overflow-x:       auto;
+  padding-bottom:   4px;
+  scrollbar-width:  none; /* Firefox: hide scrollbar */
+}
+
+.category-tabs::-webkit-scrollbar {
+  display: none; /* Chrome: hide scrollbar */
+}
+
+/* Each category pill button */
+.cat-tab {
+  flex-shrink:   0;
+  padding:       7px 16px;
+  border:        1.5px solid var(--border);
+  border-radius: 20px;
+  background:    white;
+  font-family:   "Poppins", sans-serif;
+  font-size:     13px;
+  font-weight:   500;
+  color:         var(--text-muted);
+  cursor:        pointer;
+  white-space:   nowrap;
+  transition:    all 0.2s;
+}
+
+.cat-tab:hover {
+  border-color: var(--brand);
+  color:        var(--brand);
+  background:   rgba(99, 102, 241, 0.05);
+}
+
+/* Active/selected tab */
+.cat-tab.active {
+  background:   var(--brand);
+  border-color: var(--brand);
+  color:        white;
+  box-shadow:   0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+
+/* ============================================================
+   SECTION 5 — FILES GRID & FILE CARDS
+   Responsive grid of clickable file cards
+   ============================================================ */
+.files-section {
+  padding: 24px;
+}
+
+.files-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap:                   20px;
+}
+
+/* Individual file card */
+.file-card {
+  background:    var(--card-bg);
+  border-radius: var(--radius);
+  padding:       20px;
+  cursor:        pointer;
+  border:        1.5px solid transparent;
+  box-shadow:    var(--shadow-card);
+  transition:    all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display:       flex;
+  flex-direction: column;
+  gap:           10px;
+  position:      relative;
+  overflow:      hidden;
+}
+
+/* Decorative gradient top border on hover */
+.file-card::before {
+  content:     "";
+  position:    absolute;
+  top:         0;
+  left:        0;
+  right:       0;
+  height:      3px;
+  background:  linear-gradient(90deg, var(--brand), var(--brand-alt));
+  transform:   scaleX(0);
+  transform-origin: left;
+  transition:  transform 0.3s ease;
+}
+
+.file-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* File icon (large, in the card center top) */
+.file-icon-wrap {
+  width:           52px;
+  height:          52px;
+  border-radius:   12px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       22px;
+}
+
+/* Icon background tints by file type */
+.file-icon-wrap.pdf   { background: #fff1f2; color: #ef4444; }
+.file-icon-wrap.doc   { background: #eff6ff; color: #2563eb; }
+.file-icon-wrap.image { background: #faf5ff; color: #9333ea; }
+.file-icon-wrap.other { background: #f0fdf4; color: #16a34a; }
+
+/* File card title */
+.file-card-name {
+  font-size:     14px;
+  font-weight:   600;
+  color:         var(--text-primary);
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+  flex:          1;
+}
+
+/* File card meta (category, size, date) */
+.file-card-meta {
+  font-size: 12px;
+  color:     var(--text-muted);
+}
+
+
+/* ============================================================
+   SECTION 6 — CARD HOVER EFFECT & ACCESS BADGE
+   ============================================================ */
+.file-card:hover {
+  transform:    translateY(-5px);
+  border-color: var(--brand);
+  box-shadow:   0 12px 30px rgba(99, 102, 241, 0.15);
+}
+
+.file-card:active {
+  transform: translateY(-2px);
+}
+
+/* View-only or View+Download badge on each card */
+.file-access-badge {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           5px;
+  font-size:     11px;
+  font-weight:   500;
+  padding:       4px 10px;
+  border-radius: 20px;
+  margin-top:    auto; /* Push to bottom of card */
+}
+
+.badge-view-only {
+  background: #fff7ed;
+  color:      #c2410c;
+}
+
+.badge-view-download {
+  background: #ecfdf5;
+  color:      #047857;
+}
+
+
+/* ============================================================
+   SECTION 7 — OTP MODAL OVERLAY & BOX
+   ============================================================ */
+
+/* Dark semi-transparent backdrop */
+.modal-overlay {
+  display:         none;
+  position:        fixed;
+  inset:           0;
+  background:      rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(6px);
+  z-index:         1000;
+  align-items:     center;
+  justify-content: center;
+  padding:         20px;
+}
+
+/* Show modal by switching to flex */
+.modal-overlay.open {
+  display: flex;
+}
+
+/* White modal card */
+.modal-box {
+  background:    white;
+  border-radius: 20px;
+  padding:       36px 32px;
+  width:         100%;
+  max-width:     440px;
+  position:      relative;
+  box-shadow:    0 25px 60px rgba(0, 0, 0, 0.2);
+  animation:     modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  text-align:    center;
+}
+
+/* Modal slide-in animation */
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: scale(0.92) translateY(20px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+
+/* Close ✕ button in top-right corner */
+.modal-close {
+  position:    absolute;
+  top:         14px;
+  right:       14px;
+  background:  #f3f4f6;
+  border:      none;
+  width:       32px;
+  height:      32px;
+  border-radius: 50%;
+  cursor:      pointer;
+  display:     flex;
+  align-items: center;
+  justify-content: center;
+  color:       #6b7280;
+  font-size:   14px;
+  transition:  background 0.2s;
+}
+
+.modal-close:hover {
+  background: #fee2e2;
+  color:      #dc2626;
+}
+
+/* Large icon at top of OTP modal */
+.otp-icon {
+  width:           60px;
+  height:          60px;
+  border-radius:   50%;
+  background:      rgba(99, 102, 241, 0.1);
+  color:           var(--brand);
+  font-size:       24px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  margin:          0 auto 16px auto;
+}
+
+.otp-icon.success {
+  background: rgba(16, 185, 129, 0.1);
+  color:      #10b981;
+}
+
+/* Modal title */
+.modal-box h2 {
+  font-size:     20px;
+  font-weight:   700;
+  color:         var(--text-primary);
+  margin-bottom: 8px;
+}
+
+/* Subtitle / helper text under title */
+.otp-sub {
+  font-size:     13px;
+  color:         var(--text-muted);
+  margin-bottom: 22px;
+  line-height:   1.5;
+}
+
+
+/* ============================================================
+   SECTION 8 — OTP STEP UI
+   ============================================================ */
+
+/* Labelled input group */
+.input-group {
+  text-align:    left;
+  margin-bottom: 16px;
+}
+
+.input-group label {
+  display:       block;
+  font-size:     13px;
+  font-weight:   600;
+  color:         var(--text-primary);
+  margin-bottom: 6px;
+}
+
+/* Mobile number row: country code select + number input */
+.phone-row {
+  display: flex;
+  gap:     8px;
+}
+
+.phone-row select {
+  border:        1.5px solid var(--border);
+  border-radius: 10px;
+  padding:       11px 10px;
+  font-size:     14px;
+  font-family:   "Poppins", sans-serif;
+  background:    #fafafa;
+  outline:       none;
+  cursor:        pointer;
+  flex-shrink:   0;
+  transition:    border-color 0.2s;
+}
+
+.phone-row select:focus {
+  border-color: var(--brand);
+}
+
+.input-group input[type="text"],
+.input-group input[type="tel"],
+.phone-row input {
+  width:         100%;
+  padding:       11px 14px;
+  border:        1.5px solid var(--border);
+  border-radius: 10px;
+  font-size:     14px;
+  font-family:   "Poppins", sans-serif;
+  background:    #fafafa;
+  color:         var(--text-primary);
+  outline:       none;
+  transition:    border-color 0.25s, box-shadow 0.25s;
+}
+
+.input-group input:focus,
+.phone-row input:focus {
+  border-color: var(--brand);
+  box-shadow:   0 0 0 3px rgba(99, 102, 241, 0.12);
+  background:   white;
+}
+
+/* Main action button in OTP modal */
+.otp-btn {
+  width:         100%;
+  padding:       13px;
+  border:        none;
+  border-radius: 12px;
+  background:    linear-gradient(135deg, var(--brand), #7c3aed);
+  color:         white;
+  font-size:     15px;
+  font-weight:   600;
+  font-family:   "Poppins", sans-serif;
+  cursor:        pointer;
+  transition:    transform 0.2s, box-shadow 0.2s;
+  margin-top:    4px;
+}
+
+.otp-btn:hover {
+  transform:  translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+}
+
+/* 6 individual digit boxes for OTP code */
+.otp-boxes {
+  display:         flex;
+  gap:             8px;
+  justify-content: center;
+  margin:          16px 0;
+}
+
+.otp-digit {
+  width:         44px;
+  height:        52px;
+  border:        2px solid var(--border);
+  border-radius: 10px;
+  text-align:    center;
+  font-size:     22px;
+  font-weight:   700;
+  font-family:   "Poppins", sans-serif;
+  color:         var(--text-primary);
+  outline:       none;
+  transition:    border-color 0.2s, box-shadow 0.2s;
+  background:    #fafafa;
+}
+
+.otp-digit:focus {
+  border-color: var(--brand);
+  box-shadow:   0 0 0 3px rgba(99, 102, 241, 0.15);
+  background:   white;
+}
+
+/* Shake animation for invalid OTP */
+@keyframes shake {
+  0%, 100% { transform: translateX(0);    }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px);  }
+  60%      { transform: translateX(-5px); }
+  80%      { transform: translateX(5px);  }
+}
+
+.otp-boxes.shake {
+  animation: shake 0.4s ease;
+}
+
+/* Countdown timer text */
+.otp-timer {
+  font-size:  13px;
+  color:      var(--text-muted);
+  margin-top: -6px;
+}
+
+/* Row with verify + resend buttons side by side */
+.otp-action-row {
+  display:   flex;
+  gap:       10px;
+  flex-wrap: wrap;
+}
+
+/* Resend button — lighter style */
+.otp-resend {
+  flex:          1;
+  padding:       12px;
+  border:        1.5px solid var(--brand);
+  border-radius: 12px;
+  background:    white;
+  color:         var(--brand);
+  font-size:     14px;
+  font-weight:   600;
+  font-family:   "Poppins", sans-serif;
+  cursor:        pointer;
+  transition:    background 0.2s;
+}
+
+.otp-resend:hover {
+  background: rgba(99, 102, 241, 0.07);
+}
+
+/* Error message below OTP inputs */
+.otp-error {
+  font-size:  13px;
+  color:      #ef4444;
+  margin-top: 10px;
+  min-height: 18px;
+}
+
+
+/* ============================================================
+   SECTION 9 — FILE VIEWER MODAL
+   Full-screen overlay for in-browser file reading
+   ============================================================ */
+.viewer-overlay {
+  display:    none;
+  position:   fixed;
+  inset:      0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index:    2000;
+  flex-direction: column;
+}
+
+/* Show by switching display to flex */
+.viewer-overlay.open {
+  display: flex;
+}
+
+.viewer-box {
+  display:        flex;
+  flex-direction: column;
+  width:          100%;
+  height:         100%;
+  max-width:      1100px;
+  margin:         0 auto;
+}
+
+
+/* ============================================================
+   SECTION 10 — VIEWER HEADER & CONTROLS
+   Dark header bar at the top of the file viewer
+   ============================================================ */
+.viewer-header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         12px 20px;
+  background:      #0f172a;
+  border-bottom:   1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink:     0;
+  gap:             12px;
+}
+
+.viewer-file-name {
+  font-size:     14px;
+  font-weight:   600;
+  color:         white;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+  flex:          1;
+}
+
+.viewer-controls {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  flex-shrink: 0;
+}
+
+/* Shared viewer button base */
+.viewer-btn {
+  display:       flex;
+  align-items:   center;
+  gap:           6px;
+  padding:       8px 14px;
+  border:        none;
+  border-radius: 8px;
+  font-size:     13px;
+  font-family:   "Poppins", sans-serif;
+  font-weight:   600;
+  cursor:        pointer;
+  transition:    transform 0.2s, box-shadow 0.2s;
+}
+
+/* Download button — green gradient */
+.download-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color:      white;
+}
+
+.download-btn:hover {
+  transform:  translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+/* Close button — subtle red */
+.close-btn {
+  background: rgba(239, 68, 68, 0.15);
+  color:      #ef4444;
+  border:     1px solid rgba(239, 68, 68, 0.3);
+}
+
+.close-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+}
+
+/* Scrollable content area where PDF/image renders */
+.viewer-content {
+  flex:       1;
+  overflow-y: auto;
+  padding:    20px;
+  display:    flex;
+  flex-direction: column;
+  align-items: center;
+  background: #1e293b;
+}
+
+/* Canvas pages rendered by PDF.js */
+.viewer-content canvas {
+  max-width:     100%;
+  border-radius: 4px;
+  box-shadow:    0 4px 20px rgba(0, 0, 0, 0.5);
+  margin-bottom: 12px;
+}
+
+/* Full-size image in viewer */
+.viewer-content img {
+  max-width:     100%;
+  border-radius: 8px;
+  box-shadow:    0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Word/Office files shown in iframe */
+.viewer-content iframe {
+  width:   100%;
+  height:  80vh;
+  border:  none;
+  border-radius: 8px;
+}
+
+
+/* ============================================================
+   SECTION 11 — WATERMARK OVERLAY
+   Semi-transparent text layer shown on top of viewed files.
+   Displays the user's mobile number as a deterrent to sharing.
+   ============================================================ */
+.watermark-overlay {
+  display:        none;
+  position:       fixed;
+  inset:          0;
+  z-index:        1999; /* Below viewer header, above content */
+  pointer-events: none; /* Allow clicks through to content */
+  overflow:       hidden;
+}
+
+
+/* ============================================================
+   SECTION 12 — SECURITY RESTRICTIONS
+   Prevent select, copy, print, and long-press on document content
+   ============================================================ */
+
+/* Disable text selection on the entire document */
+body {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+
+/* Allow text selection only in form inputs */
+input,
+textarea,
+select {
+  -webkit-user-select: text;
+     -moz-user-select: text;
+          user-select: text;
+}
+
+/* Hide content when printing (blocks print-to-PDF) */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+}
+
+
+/* ============================================================
+   SECTION 13 — ANIMATIONS & TRANSITIONS
+   ============================================================ */
+
+/* Card grid entrance animation (staggered per card) */
+@keyframes cardFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.file-card {
+  animation: cardFadeUp 0.35s ease both;
+}
+
+/* Loading spinner for async operations */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  width:         32px;
+  height:        32px;
+  border:        3px solid rgba(99, 102, 241, 0.2);
+  border-top:    3px solid var(--brand);
+  border-radius: 50%;
+  animation:     spin 0.7s linear infinite;
+  margin:        40px auto;
+}
+
+
+/* ============================================================
+   SECTION 14 — RESPONSIVE BREAKPOINTS
+   ============================================================ */
+
+/* Tablet: tighter header, slightly narrower cards */
+@media (max-width: 768px) {
+
+  .page-header {
+    padding: 10px 16px;
+    gap:     10px;
   }
 
-  .top-controls{
-    flex-wrap:wrap;
+  .header-title {
+    font-size: 16px;
   }
 
-  #search, select{
-    flex:1;
-    min-width:140px;
+  .search-box {
+    max-width: 100%;
   }
 
-  .file-grid{
-    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  .files-section {
+    padding: 16px;
   }
 
-  .viewer-box{
-    width:95%;
-    height:85%;
+  .files-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
   }
 
-}
-
-/* =========================
-   MOBILE RESPONSIVE
-========================= */
-@media (max-width:600px){
-
-  body{
-    padding:15px;
+  .modal-box {
+    padding: 28px 20px;
   }
 
-  h2{
-    font-size:20px;
-  }
-.viewer-box{
-    width:96%;
-    height:92%;
-  }
-
-  .viewer-header img{
-    height:55px;
-  }
-
-  .download-btn{
-    bottom:12px;
-    right:12px;
-    padding:8px 14px;
-    font-size:13px;
-  }
-
- 
-  /* Controls stack */
-  .top-controls{
-    flex-direction:column;
-    gap:10px;
-  }
-
-  #search, select{
-    width:100%;
-  }
-
-  /* Cards full width */
-  .file-grid{
-    grid-template-columns:1fr;
-  }
-
-  .card{
-    padding:14px;
-  }
-.card h4{
-font-size:16px;
-}
-  /* OTP modal */
-  .otp-card,
-  .otp-card-modern{
-    width:92%;
-    padding:20px;
-  }
-
-  .otp-boxes{
-    justify-content:space-between;
-  }
-
-  .otp-boxes input{
-    width:48px;
-    height:52px;
-    font-size:18px;
-  }
-
-  /* Viewer */
-  .viewer-box{
-    width:96%;
-    height:85%;
-    border-radius:10px;
-  }
-
-  /* Download button mobile position */
-  .download-btn{
-    bottom:12px;
-    right:12px;
-    padding:8px 14px;
-    font-size:13px;
-  }
-
-  /* Watermark smaller */
-/* Watermark container */
-.watermarks{
-position:absolute;
-top:70px;
-left:0;
-width:100%;
-height:calc(100% - 70px);
-pointer-events:none;
-z-index:5;
-}
-
-/* Watermark */
-.wm{
-position:absolute;
-color:rgba(0,0,0,0.18);
-font-size:8vw;
-font-weight:bold;
-transform:rotate(-28deg);
-user-select:none;
-}
-
-/* Random positions */
-
-.wm1{
-top:15%;
-left:10%;
-}
-
-.wm2{
-top:55%;
-left:20%;
-}
-
-.wm3{
-top:30%;
-right:10%;
-}
-
-.wm4{
-bottom:10%;
-right:25%;
-}
-}
-
-/* =========================
-   SMALL PHONES
-========================= */
-@media (max-width:400px){
-
-  .otp-boxes input{
-    width:42px;
-    height:46px;
-    font-size:16px;
-  }
-
-  .download-btn{
-    font-size:12px;
-    padding:7px 12px;
+  .otp-digit {
+    width:  38px;
+    height: 46px;
+    font-size: 18px;
   }
 
 }
-.close-btn{
-  position:absolute;
-  top:12px;
-  right:15px;
-  font-size:20px;
-  cursor:pointer;
-  color:#666;
-  transition:0.2s;
-}
 
-.close-btn:hover{
-  color:#000;
-  transform:scale(1.1);
-}
+/* Mobile: single-column category bar scrolls, 2-up cards */
+@media (max-width: 480px) {
 
+  .category-bar {
+    padding: 8px 12px;
+    top:     65px;
+  }
+
+  .files-section {
+    padding: 12px;
+  }
+
+  .files-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .file-card {
+    padding: 14px 12px;
+  }
+
+  .viewer-header {
+    padding: 10px 14px;
+  }
+
+  .viewer-btn {
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+
+  .otp-digit {
+    width:     34px;
+    height:    42px;
+    font-size: 16px;
+    gap:       4px;
+  }
+
+  .otp-boxes {
+    gap: 6px;
+  }
+
+}

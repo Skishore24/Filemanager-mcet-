@@ -29,27 +29,24 @@ async function loadCategories(){
   categories = await res.json();
   showCategories();
 }
-async function loadFiles(){
-  try{
+async function loadFiles() {
+  try {
 
-    let token = localStorage.getItem("token");
+    const tok = localStorage.getItem("token");
 
-    let res = await fetch("/api/files",{
-      headers:{
-        "Authorization": "Bearer " + token
-      }
+    const res = await fetch("/api/files", {
+      headers: { "Authorization": "Bearer " + tok }
     });
 
-    if(!res.ok){
-      throw new Error("Server error");
-    }
+    if (!res.ok) throw new Error("Server error");
 
     files = await res.json();
     showFiles();
 
-  }catch(err){
-    console.log("Error loading files:", err);
-    alert("Failed to load files");
+  } catch (err) {
+    console.error("Error loading files:", err);
+    /* Show toast instead of blocking alert() dialog */
+    showToast("❌ Failed to load files. Please refresh.", "error");
   }
 }
 
@@ -60,7 +57,7 @@ let tempFiles = [];
 function addFile() {
 
   if (!fileInput || fileInput.files.length === 0) {
-    alert("Select a file");
+    showToast("Please select a file first.", "info");
     return;
   }
 
@@ -368,18 +365,23 @@ function closeDetails(){
   document.getElementById("detailsModal").style.display = "none";
 }
 
-function copyLink(){
-  let file = files[selectedIndex];
-  let url = window.location.origin + "/user/user.html?file=" + encodeURIComponent(file.name);
+async function copyLink(){
+  const file = files[selectedIndex];
+  const url = window.location.origin + "/user/user.html?file=" + encodeURIComponent(file.name);
 
-  const tempInput = document.createElement("input");
-  tempInput.value = url;
-  document.body.appendChild(tempInput);
-  tempInput.select();
-  document.execCommand("copy");
-  document.body.removeChild(tempInput);
-
-  alert("Link copied");
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast("Link copied to clipboard!");
+  } catch {
+    // Fallback for older browsers
+    const tempInput = document.createElement("input");
+    tempInput.value = url;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    showToast("Link copied!");
+  }
 }
 
 function copyFileUrl(fileName){
@@ -936,26 +938,29 @@ function closeUploadModal(){
   document.getElementById("uploadModal").style.display = "none";
 }
 
-function saveManualFile(){
+function saveManualFile() {
 
-  let name = document.getElementById("name").value;
-  let category = document.getElementById("category").value;
-  let size = document.getElementById("size").value;
-  let importance = document.getElementById("importance").value;
+  const name       = document.getElementById("name").value;
+  const category   = document.getElementById("category").value;
+  const size       = document.getElementById("size").value;
+  const importance = document.getElementById("importance").value;
 
-  fetch("/api/files",{
-  method:"POST",
-  headers:{
-    "Content-Type":"application/json",
-    "Authorization":"Bearer " + token
-  },
-  body:JSON.stringify({name,category,size,importance})
-}).then(()=>{
-    alert("File Added");
-    location.reload();
+  fetch("/api/files", {
+    method:  "POST",
+    headers: {
+      "Content-Type":  "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({ name, category, size, importance })
+  }).then(() => {
+    showToast("✅ File added successfully!", "success");
+    setTimeout(() => location.reload(), 1500);
+  }).catch(() => {
+    showToast("❌ Failed to add file. Please try again.", "error");
   });
+
 }
-function logoutUser(){
+function logoutUser() {
   localStorage.removeItem("token");
   localStorage.removeItem("currentUser");
   sessionStorage.clear();
@@ -963,19 +968,46 @@ function logoutUser(){
 }
 
 
-/* ===== Load Logged User Info ===== */
+/* ============================================================
+   Load logged-in user's email into the sidebar profile box
+   ============================================================ */
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+if (currentUser) {
+  const emailEl = document.getElementById("userEmail");
+  if (emailEl) emailEl.innerText = currentUser.email || "";
+}
 
 
-let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+/* ============================================================
+   showToast(message, type)
+   Displays a pop-up notification at the bottom-right corner.
+   type: "success" | "error" | "info"
+   Disappears after 3.5 seconds automatically.
+   ============================================================ */
+function showToast(message, type = "success") {
 
-if(currentUser){
+  const toast = document.getElementById("toast");
+  if (!toast) return;
 
-  let nameEl = document.getElementById("userName");
-  let emailEl = document.getElementById("userEmail");
+  /* Colour coding by type */
+  const colours = {
+    success: { bg: "#111827", border: "#10b981" },
+    error:   { bg: "#111827", border: "#ef4444" },
+    info:    { bg: "#111827", border: "#6366f1" }
+  };
 
-  if(nameEl)
-    nameEl.innerText = currentUser.name || "Admin";
+  const { bg, border } = colours[type] || colours.success;
 
-  if(emailEl)
-    emailEl.innerText = currentUser.email || "";
+  toast.style.background    = bg;
+  toast.style.borderLeft    = `4px solid ${border}`;
+  toast.style.paddingLeft   = "14px";
+  toast.style.borderRadius  = "8px";
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  /* Auto-dismiss after 3.5 s */
+  setTimeout(() => toast.classList.remove("show"), 3500);
+
 }

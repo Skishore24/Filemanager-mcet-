@@ -1,13 +1,32 @@
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:"Poppins", sans-serif;
+/* ============================================================
+   views.css — File View Logs Page
+   Section map:
+   1. Reset & Base
+   2. Layout (main, body)
+   3. Page Title
+   4. Table Card & Header
+   5. Filters & Buttons
+   6. File Table
+   7. Row Animation & Hover
+   8. Status Badges
+   9. Modals
+   10. Pagination
+   11. Bulk Actions Bar
+   12. Icon Colours
+   13. Responsive (mobile, tablet)
+   ============================================================ */
+
+/* ===== 1. Reset & Base ===== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
-body{
-  background:#f6f8fc;
-  min-height:100vh;
+body {
+  background: #f6f8fc;
+  min-height: 100vh;
 }
 
 
@@ -215,12 +234,47 @@ body{
   cursor:pointer;
 }
 
-.file-table tbody tr{
-  transition:background .2s ease;
+/* ===== 7. Row Animation & Hover ===== */
+
+/* Every row fades+slides in on load */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.file-table tbody tr:hover{
-  background:#f8fafc;
+
+.file-table tbody tr {
+  transition: background .2s ease, box-shadow .2s ease, transform .15s ease;
+  animation: fadeSlideIn .3s ease both;
 }
+
+/* Stagger animation for first 10 rows */
+.file-table tbody tr:nth-child(1)  { animation-delay: .03s; }
+.file-table tbody tr:nth-child(2)  { animation-delay: .06s; }
+.file-table tbody tr:nth-child(3)  { animation-delay: .09s; }
+.file-table tbody tr:nth-child(4)  { animation-delay: .12s; }
+.file-table tbody tr:nth-child(5)  { animation-delay: .15s; }
+.file-table tbody tr:nth-child(6)  { animation-delay: .18s; }
+.file-table tbody tr:nth-child(7)  { animation-delay: .21s; }
+.file-table tbody tr:nth-child(8)  { animation-delay: .24s; }
+
+.file-table tbody tr:hover {
+  background: #f0f4ff;
+  box-shadow: inset 3px 0 0 #6366f1;  /* Left accent border on hover */
+}
+
+/* ===== 8. Status Badges ===== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.view   { background: #ede9fe; color: #7c3aed; }
+.status-badge.download { background: #dcfce7; color: #16a34a; }
 
 /* Modal */
 .modal{
@@ -411,10 +465,26 @@ body{
 .date-header select:hover{
   border-color:#6366f1;
 }
-#bulkActionsLogs{
+
+/* ===== 11. Bulk Actions Bar ===== */
+#bulkActionsLogs {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  border-radius: 10px;
+  margin-bottom: 14px;
   transition: all .25s ease;
 }
-.fa-file-pdf{ color:#ef4444; }
+
+#bulkActionsLogs .btn-delete {
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+/* ===== 12. Icon Colours ===== */
 .fa-file-word{ color:#2563eb; }
 .fa-file-excel{ color:#16a34a; }
 .fa-file-powerpoint{ color:#ea580c; }

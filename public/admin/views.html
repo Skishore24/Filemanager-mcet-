@@ -1,58 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>File View Logs</title>
-<link rel="stylesheet" href="sidebar.css">
-<link rel="stylesheet" href="views.css">
-<link rel="icon" href="images/logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MCET File Manager — Admin View Logs Panel">
+  <title>File View Logs | MCET Admin</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="stylesheet" href="views.css">
+  <link rel="icon" href="images/logo.png">
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 </head>
 
 <body>
 
-<div class="sidebar">
+  <!-- Navigation Sidebar -->
+  <nav class="sidebar" aria-label="Admin navigation">
 
-  <div class="logo-box">
-    <img src="images/logo.png" alt="College Logo">
-  </div>
-
-  <div class="menu">
-    <a href="dashboard.html">
-      <i class="fa fa-chart-line"></i> Dashboard
-    </a>
-
-    <a href="manage.html">
-      <i class="fa fa-folder-open"></i> Manage Files
-    </a>
-
-    <a href="views.html"class="active">
-      <i class="fa fa-eye"></i> View Logs
-    </a>
-
-    <a href="userDetails.html">
-      <i class="fa fa-users"></i> User Analytics
-    </a>
-  </div>
-
-  <div class="sidebar-bottom">
-    <div class="profile-box">
-  <img src="images/avatar.jpg" class="avatar">
-  <div class="profile-info">
-    <span id="userEmail"></span>
-  </div>
-</div>
+    <div class="logo-box">
+      <img src="images/logo.png" alt="MCET College Logo">
     </div>
 
-    <button class="logout-btn" onclick="logoutUser()">
-      <i class="fa fa-sign-out-alt"></i> Logout
-    </button>
-  </div>
+    <div class="menu">
+      <a href="dashboard.html"><i class="fa fa-chart-line"></i> Dashboard</a>
+      <a href="manage.html"><i class="fa fa-folder-open"></i> Manage Files</a>
+      <a href="views.html" class="active"><i class="fa fa-eye"></i> View Logs</a>
+      <a href="userDetails.html"><i class="fa fa-users"></i> User Analytics</a>
+    </div>
 
-</div>
+    <div class="sidebar-bottom">
+      <div class="profile-box">
+        <img src="images/avatar.jpg" class="avatar" alt="Admin avatar">
+        <div class="profile-info">
+          <span id="userEmail"></span>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logoutUser()" aria-label="Logout">
+        <i class="fa fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+
+  </nav>
 
 <div class="overlay" onclick="toggleMenu()"></div>
 

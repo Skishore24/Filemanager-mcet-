@@ -1,327 +1,382 @@
+/* ============================================================
+   sidebar.css — Shared Sidebar + Layout Styles
+   Used by: dashboard.html, manage.html, views.html, userDetails.html
 
-/* Sidebar */
-.sidebar{
-  position:fixed;
-  left:0;
-  top:0;
-  height:100vh;
-  width:250px;
-  background:linear-gradient(180deg,#0f172a,#020617);
-  color:white;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  z-index:2000;
-  transition:0.3s ease;   /* ADD THIS */
-}
-/* ===== Global Close Button Style ===== */
+   Sections:
+   1.  CSS Custom Properties (Design Tokens)
+   2.  Global Reset Helpers
+   3.  Sidebar Shell
+   4.  Logo Box
+   5.  Navigation Menu
+   6.  Profile Box + Avatar
+   7.  Logout Button
+   8.  Close Button (shared modal utility)
+   9.  Overlay (mobile backdrop)
+   10. Table Overflow Utilities
+   11. Mobile Hamburger Toggle
+   12. Responsive Breakpoints
+   ============================================================ */
 
-.modal-content{
-  position:relative;
-}
 
-.close{
-  position:absolute;
-  top:15px;
-  right:18px;
-  cursor:pointer;
-  font-size:20px;
-  font-weight:600;
-  color:#000;
-  width:30px;
-  height:30px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:50%;
-  transition:0.25s ease;
-}
-
-.close:hover{
-  background:#fee2e2;
-  color:#dc2626;
+/* ============================================================
+   SECTION 1 — CSS CUSTOM PROPERTIES (Design Tokens)
+   Change values here to retheme the entire admin panel
+   ============================================================ */
+:root {
+  --sidebar-bg:        linear-gradient(180deg, #0f172a 0%, #020617 100%);
+  --sidebar-width:     250px;
+  --brand-purple:      #6366f1;
+  --brand-violet:      #7c3aed;
+  --brand-gradient:    linear-gradient(135deg, #6366f1, #7c3aed);
+  --text-muted:        #94a3b8;
+  --menu-hover-bg:     rgba(99, 102, 241, 0.12);
+  --nav-text:          #cbd5e1;
 }
 
 
-/* Logo */
-.logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:20px;
-}
+/* ============================================================
+   SECTION 2 — GLOBAL RESET HELPERS
+   Text overflow and table layout fixes applied globally
+   ============================================================ */
 
-.logo-circle{
-  width:34px;
-  height:34px;
-  border-radius:50%;
-  background:linear-gradient(135deg,#6366f1,#7c3aed);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:600;
-}
-
-/* Menu */
-.menu a{
-  display:flex;
-  align-items:center;
-  flex:1;
-  gap:12px;
-  color:#cbd5e1;
-  text-decoration:none;
-  padding:10px 12px;
-  border-radius:10px;
-  margin-bottom:6px;
-  transition:0.25s;
-}
-
-.menu a i{
-  width:18px;
-}
-
-.menu a:hover{
-  background:#1e293b;
-}
-
-.menu a.active{
-  background:linear-gradient(135deg,#6366f1,#7c3aed);
-  color:white;
-}
-
-/* Bottom section */
-.sidebar-bottom{
-  margin-top:auto;
-}
-
-.profile{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:15px;
-}
-
-.profile img{
-  width:38px;
-  height:38px;
-  border-radius:50%;
-}
-
-.name{
-  font-size:14px;
-  font-weight:500;
-}
-
-.role{
-  font-size:12px;
-  color:#94a3b8;
-}
-
-/* Logout button */
-.logout-btn{
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  background:#ef4444;
-  color:white;
-  cursor:pointer;
-  transition:0.25s;
-}
-
-.logout-btn:hover{
-  background:#dc2626;
-}
-.logo-box{
-  text-align:center;
-  margin-bottom:25px;
-}
-
-.logo-box img{
-  width:150px;
-  height:auto;
-  object-fit:contain;
-}
-
-.sidebar-bottom{
-  margin-top:auto;
-}
-
-/* Profile box */
-.profile-box{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  background:#111827;
-  padding:10px;
-  border-radius:12px;
-  margin-bottom:12px;
-}
-
-/* Avatar */
-.avatar{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  object-fit:cover;
-  border:2px solid #6366f1;
-}
-
-/* Name + email */
-.profile-info{
-  text-align:left;
-}
-
-.profile-info span{
-  font-size:14px;
-  font-weight:500;
-}
-
-.popup-profile-info span,
-.profile-box span,
-#userEmail{
-  font-size:14px;
-  font-weight:600;   /* Bold */
-  color:#ffffff;     /* White */
-}
-
-.sidebar h2{
-  margin-bottom:24px;
-  font-weight:600;
-  letter-spacing:.5px;
-}
-
-.sidebar a{
-  display:block;
-  color:#cbd5e1;
-  text-decoration:none;
-  padding:11px 14px;
-  border-radius:12px;
-  margin-bottom:10px;
-  transition:0.25s;
-}
-
-.sidebar a:hover{
-  background:#1e293b;
-  transform:translateX(4px);
-}
-
-.sidebar a.active{
-  background:linear-gradient(135deg,#6366f1,#7c3aed);
-  color:white;
-}
-/* ===== SIDEBAR RESPONSIVE ===== */
-
-.menu-toggle{
-  display:none;
-  font-size:22px;
-  background:#6366f1;
-  color:white;
-  border:none;
-  padding:8px 12px;
-  border-radius:6px;
-  cursor:pointer;
-  margin-bottom:15px;
-}
-/* Overlay for mobile */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.35);
-  display:none;
-  z-index:1500;
-}
-
-.overlay.active{
-  display:block;
-}
-/* =========================
-GLOBAL TEXT OVERFLOW FIX
-========================= */
-
-/* Prevent text from breaking layout */
-table{
+/* Prevent table columns from blowing out the layout */
+table {
   table-layout: fixed;
-  width: 100%;
+  width:        100%;
 }
 
-td, th{
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  max-width:200px;
+/* Truncate long text in table cells with ellipsis */
+td, th {
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+  max-width:     200px;
 }
-/* For names or titles */
-span, p, h1, h2, h3, h4, h5, h6{
+
+/* Allow long words/names to wrap in non-table elements */
+span, p, h1, h2, h3, h4, h5, h6 {
   word-break: break-word;
 }
 
-/* For table cells containing long names */
+/* Cap table columns for file and user tables */
 .file-table td,
-.users-table td{
-  max-width:180px;
+.users-table td {
+  max-width: 180px;
 }
 
-/* Avatar + name container */
+/* Avatar + name container in tables */
 .user-name,
-.user-info{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  max-width:200px;
+.user-info {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  max-width:   200px;
 }
 
 .user-name span,
-.user-info span{
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-/* Mobile & Tablet */
-@media(max-width:900px){
-body{
-    overflow-x: hidden;
-}
-  .sidebar{
-    width:240px;
-    left:0;
-    transform:translateX(-100%);   /* hide sidebar */
-    transition:0.3s ease;
-    padding:14px;
-    height:100vh;
-    overflow-y:auto;
-  }
-
-/* FORCE sidebar open when active */
-.sidebar.active{
-  transform:translateX(0) !important;
+.user-info span {
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
 }
 
-  .menu-toggle{
-    display:inline-block;
-    margin-bottom:15px;
+
+/* ============================================================
+   SECTION 3 — SIDEBAR SHELL
+   Fixed left panel. Slides in on mobile with transform.
+   ============================================================ */
+.sidebar {
+  position:       fixed;
+  left:           0;
+  top:            0;
+  height:         100vh;
+  width:          var(--sidebar-width);
+  background:     var(--sidebar-bg);
+  color:          white;
+  padding:        20px 16px;
+  display:        flex;
+  flex-direction: column;
+  z-index:        2000;
+  transition:     transform 0.3s ease;
+  overflow-y:     auto;
+
+  /* Subtle border to separate from main content */
+  border-right:   1px solid rgba(255, 255, 255, 0.05);
+}
+
+
+/* ============================================================
+   SECTION 4 — LOGO BOX
+   ============================================================ */
+.logo-box {
+  text-align:    center;
+  margin-bottom: 28px;
+  padding:       10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logo-box img {
+  width:      150px;
+  height:     auto;
+  object-fit: contain;
+}
+
+
+/* ============================================================
+   SECTION 5 — NAVIGATION MENU
+   Each link is a flex row with icon + label.
+   Active link gets a gradient background.
+   ============================================================ */
+.menu {
+  flex: 1;
+}
+
+.menu a {
+  display:         flex;
+  align-items:     center;
+  gap:             12px;
+  color:           var(--nav-text);
+  text-decoration: none;
+  padding:         11px 13px;
+  border-radius:   12px;
+  margin-bottom:   4px;
+  font-size:       14px;
+  font-weight:     500;
+  transition:      background 0.2s, color 0.2s, transform 0.2s;
+}
+
+/* Icon column — fixed width to keep labels aligned */
+.menu a i {
+  width:     18px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Hover: subtle highlight */
+.menu a:hover {
+  background: var(--menu-hover-bg);
+  color:      #e2e8f0;
+  transform:  translateX(3px);
+}
+
+/* Active: full gradient pill */
+.menu a.active {
+  background: var(--brand-gradient);
+  color:      #ffffff;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+}
+
+
+/* ============================================================
+   SECTION 6 — SIDEBAR BOTTOM (Profile + Logout)
+   ============================================================ */
+.sidebar-bottom {
+  margin-top:  auto;
+  padding-top: 16px;
+  border-top:  1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Profile info card */
+.profile-box {
+  display:       flex;
+  align-items:   center;
+  gap:           10px;
+  background:    rgba(255, 255, 255, 0.05);
+  padding:       10px 12px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+/* Admin avatar circle */
+.avatar {
+  width:        38px;
+  height:       38px;
+  border-radius: 50%;
+  object-fit:   cover;
+  border:       2px solid var(--brand-purple);
+  flex-shrink:  0;
+}
+
+.profile-info {
+  text-align: left;
+  min-width:  0; /* allows text-overflow to work */
+}
+
+/* Email display in profile box */
+.profile-info span,
+.popup-profile-info span,
+.profile-box span,
+#userEmail {
+  font-size:     13px;
+  font-weight:   600;
+  color:         #ffffff;
+  display:       block;
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  max-width:     160px;
+}
+
+
+/* ============================================================
+   SECTION 7 — LOGOUT BUTTON
+   ============================================================ */
+.logout-btn {
+  width:         100%;
+  padding:       10px;
+  border:        none;
+  border-radius: 10px;
+  background:    linear-gradient(135deg, #ef4444, #dc2626);
+  color:         white;
+  font-size:     14px;
+  font-weight:   600;
+  cursor:        pointer;
+  transition:    transform 0.2s, box-shadow 0.2s;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  gap:           8px;
+}
+
+.logout-btn:hover {
+  transform:  translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+}
+
+
+/* ============================================================
+   SECTION 8 — MODAL CLOSE BUTTON (Shared utility)
+   Used in every modal in the admin panel
+   ============================================================ */
+.modal-content {
+  position: relative;
+}
+
+.close {
+  position:       absolute;
+  top:            14px;
+  right:          16px;
+  cursor:         pointer;
+  font-size:      18px;
+  font-weight:    700;
+  color:          #6b7280;
+  width:          32px;
+  height:         32px;
+  display:        flex;
+  align-items:    center;
+  justify-content: center;
+  border-radius:  50%;
+  transition:     background 0.2s, color 0.2s;
+}
+
+.close:hover {
+  background: #fee2e2;
+  color:      #dc2626;
+}
+
+
+/* ============================================================
+   SECTION 9 — OVERLAY (Mobile sidebar backdrop)
+   Shown behind sidebar on mobile to allow tap-to-close
+   ============================================================ */
+.overlay {
+  position:   fixed;
+  inset:      0;
+  background: rgba(0, 0, 0, 0.45);
+  display:    none;
+  z-index:    1500;
+  backdrop-filter: blur(2px);
+  transition: opacity 0.3s;
+}
+
+.overlay.active {
+  display: block;
+}
+
+
+/* ============================================================
+   SECTION 10 — HAMBURGER TOGGLE (Mobile)
+   Hidden on desktop, shown on small screens
+   ============================================================ */
+.menu-toggle {
+  display:       none;
+  font-size:     20px;
+  background:    var(--brand-gradient);
+  color:         white;
+  border:        none;
+  padding:       8px 13px;
+  border-radius: 8px;
+  cursor:        pointer;
+  margin-bottom: 14px;
+  width:         auto; /* override global button width:100% */
+  box-shadow:    0 4px 12px rgba(99, 102, 241, 0.3);
+  transition:    transform 0.2s;
+}
+
+.menu-toggle:hover {
+  transform: scale(1.05);
+}
+
+
+/* ============================================================
+   SECTION 11 — RESPONSIVE BREAKPOINTS
+   ============================================================ */
+
+/* ---- Tablet & Mobile (≤ 900px) ---- */
+@media (max-width: 900px) {
+
+  body {
+    overflow-x: hidden; /* Prevent horizontal scroll when sidebar slides */
   }
 
-  .logo-box img{
-    width:110px;
+  /* Sidebar is hidden off-screen by default on mobile */
+  .sidebar {
+    width:     240px;
+    left:      0;
+    transform: translateX(-100%); /* Slide out */
+    padding:   14px;
+    z-index:   2000;
   }
 
-  .menu a{
-    padding:8px 10px;
-    font-size:14px;
+  /* Sidebar slides in when .active is added via JS */
+  .sidebar.active {
+    transform: translateX(0) !important;
   }
 
-  .profile-box{
-    padding:8px;
+  .menu-toggle {
+    display: inline-flex; /* Show hamburger */
+    align-items: center;
+    gap: 6px;
   }
 
-  .avatar{
-    width:32px;
-    height:32px;
+  .logo-box img {
+    width: 110px;
   }
 
-  .logout-btn{
-    padding:8px;
-    font-size:14px;
+  .menu a {
+    padding:   9px 10px;
+    font-size: 13px;
+  }
+
+  .profile-box {
+    padding: 8px;
+  }
+
+  .avatar {
+    width:  32px;
+    height: 32px;
+  }
+
+  .logout-btn {
+    padding:   8px;
+    font-size: 13px;
+  }
+
+}
+
+/* ---- Small screens: tighter table ---- */
+@media (max-width: 600px) {
+  .stats-row {
+    grid-template-columns: 1fr;
   }
 }
