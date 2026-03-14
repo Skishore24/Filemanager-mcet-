@@ -6,12 +6,13 @@ const verifyAdmin = require("../middleware/verifyAdmin");
 /* SAVE VIEW LOG */
 router.post("/save-view", (req,res)=>{
 
-  const {file,name,mobile,country,state,device} = req.body;
-    if(!mobile){
-    return res.status(400).json({error:"Mobile required"});
-    }
+  const {file,name,mobile,country,state,device,ip: clientIp} = req.body;
+  if (!file || !mobile) {
+    return res.status(400).json({ error: "File and Mobile required" });
+  }
+
   // Get real IP here
-const ip =
+const ip = clientIp ||
 req.headers["x-forwarded-for"]?.split(",")[0] ||
 req.socket.remoteAddress ||
 req.ip;
@@ -30,9 +31,12 @@ req.ip;
 });
 router.post("/save-download", (req,res)=>{
 
-  const {file,name,mobile,country,state,device} = req.body;
+  const {file,name,mobile,country,state,device,ip: clientIp} = req.body;
+  if (!file || !mobile) {
+    return res.status(400).json({ error: "File and Mobile required" });
+  }
 
- const ip =
+ const ip = clientIp ||
 req.headers["x-forwarded-for"]?.split(",")[0] ||
 req.socket.remoteAddress ||
 req.ip;
@@ -61,7 +65,7 @@ router.get("/logs", verifyAdmin, (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const offset = (page - 1) * limit;
 
-  const sort = req.query.sort === "oldest" ? "ASC" : "DESC";
+  const sort = (req.query.sort || "DESC").toUpperCase() === "ASC" ? "ASC" : "DESC";
 
   let where = "WHERE 1=1";
   let params = [];

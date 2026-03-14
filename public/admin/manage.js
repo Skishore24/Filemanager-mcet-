@@ -284,11 +284,11 @@ onchange="updateBulkActions(); event.stopPropagation();">
 <td data-label="File Name" class="file-name-cell">
 <i class="fa-regular ${getFileIcon(file.name)}"></i>
 
-<span title="${file.name}">${file.name}</span>
+<span title="${escapeHTML(file.name)}">${escapeHTML(file.name)}</span>
 </td>
 
 <td data-label="Category">
-<span class="badge-cat">${file.category}</span>
+<span class="badge-cat">${escapeHTML(file.category)}</span>
 </td>
 
 <td data-label="Size">${file.size || "-"}</td>
@@ -328,8 +328,8 @@ function openDetails(index){
 
   let file = files[index];
 
-  document.getElementById("dName").innerText = file.name;
-  document.getElementById("dSize").innerText = file.size;
+  document.getElementById("dName").textContent = file.name;
+  document.getElementById("dSize").textContent = file.size;
 let formattedDate = new Date(file.date).toLocaleString("en-IN", {
   year: "numeric",
   month: "short",
@@ -338,9 +338,9 @@ let formattedDate = new Date(file.date).toLocaleString("en-IN", {
   minute: "2-digit"
 });
 
-document.getElementById("dDate").innerText = formattedDate;
+document.getElementById("dDate").textContent = formattedDate;
   // ← REPLACE THIS LINE
-  document.getElementById("dCategory").innerText = file.category || "General";
+  document.getElementById("dCategory").textContent = file.category || "General";
 
   document.getElementById("dImportance").innerText =
 file.importance === "important"
@@ -631,7 +631,7 @@ function showCategories(){
   pageData.forEach((cat,index)=>{
     list.innerHTML += `
       <tr>
-<td>${cat.name}</td>
+<td>${escapeHTML(cat.name)}</td>
         <td>
           <button class="btn-edit" onclick="editCategory(${start+index})">Edit</button>
           <button class="btn-delete" onclick="confirmDeleteCategory(${start+index})">Delete</button>
@@ -692,11 +692,12 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCategories();
 });
 
+let deleteCategoryIndex = null;
 function deleteCategory(){
 
-  if(deleteIndex === null) return;
+  if(deleteCategoryIndex === null) return;
 
-  let cat = categories[deleteIndex];
+  let cat = categories[deleteCategoryIndex];
 
   fetch("/api/categories/" + cat.id,{
   method:"DELETE",
@@ -704,7 +705,7 @@ function deleteCategory(){
     "Authorization":"Bearer " + token
   }
 }).then(()=>{
-    deleteIndex = null;   // important
+    deleteCategoryIndex = null;   // important
     closeConfirm();
     loadCategories();
   });
@@ -779,7 +780,10 @@ async function openFilter() {
   select.innerHTML = `<option value="All">All</option>`;
 
   categories.forEach(cat=>{
-    select.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
+    let opt = document.createElement('option');
+    opt.value = cat.name;
+    opt.textContent = cat.name;
+    select.appendChild(opt);
   });
 
   document.getElementById("filterModal").style.display="flex";

@@ -14,8 +14,6 @@ const storage = multer.diskStorage({
 
 const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g,"");
 cb(null, Date.now() + "-" + safeName);
- cb(null, Date.now() + "-" + safeName);
-
 }
 });
 
@@ -87,7 +85,11 @@ router.delete("/:id", verifyAdmin, (req, res) => {
     const filePath = path.join(__dirname, "../uploads", file.name);
 
     if(fs.existsSync(filePath)){
-      fs.unlinkSync(filePath);
+      try {
+        fs.unlinkSync(filePath);
+      } catch (err) {
+        console.log("Error deleting physical file:", err);
+      }
     }
 
     db.query("DELETE FROM files WHERE id=?", [req.params.id], (err) => {

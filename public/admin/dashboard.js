@@ -186,12 +186,10 @@ if(data.views && data.views.length){
 }else{
   console.log("Users chart: no data");
 }
-  if(data.countries && data.countries.length){
   setTimeout(()=>{
-    drawWorldMap(data.countries);
-    loadTopCountries(data.countries);
+    drawWorldMap(data.countries || []);
+    loadTopCountries(data.countries || []);
   },200);
-}
 
 if(data.topUsers) loadTopUsers(data.topUsers);
 

@@ -117,13 +117,13 @@ table.innerHTML += `
   <div class="user-name">
     <div class="user-avatar"
          style="background:${getAvatarColor(name)}">
-         ${name.charAt(0).toUpperCase()}
+         ${escapeHTML(name).charAt(0).toUpperCase()}
     </div>
-    <span>${name}</span>
+    <span>${escapeHTML(name)}</span>
   </div>
 </td>
 
-<td data-label="Mobile">${mobile}</td>
+<td data-label="Mobile">${escapeHTML(mobile)}</td>
 
 <td data-label="Status">
   <span class="status ${status}">
@@ -131,12 +131,12 @@ table.innerHTML += `
     ${status === "online" ? "Online" : "Offline"}
   </span>
 </td>
-<td data-label="Location">${location}</td>
+<td data-label="Location">${escapeHTML(location)}</td>
 
 <td data-label="Visits">${visits}</td>
 
 <td data-label="Action">
-  <button class="view-btn" onclick="openUser('${mobile}')">View</button>
+  <button class="view-btn" onclick="openUser('${escapeHTML(mobile)}')">View</button>
 </td>
 </tr>`;
 
@@ -226,7 +226,7 @@ function renderPopupFiles(userLogs){
 pageLogs.forEach(log=>{
 table.innerHTML += `
 <tr>
-  <td data-label="File">${log.file_name}</td>
+  <td data-label="File">${escapeHTML(log.file_name)}</td>
   <td data-label="Viewed At">${formatDateTime(log.viewed_at)}</td>
 
 </tr>`;
@@ -542,4 +542,16 @@ if(currentUser){
 
   if(emailEl)
     emailEl.innerText = currentUser.email || "";
+}
+function escapeHTML(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[&<>'"]/g, 
+    tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag])
+  );
 }

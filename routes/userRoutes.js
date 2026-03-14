@@ -6,6 +6,7 @@ const verifyAdmin = require("../middleware/verifyAdmin");
 /* CHECK BLOCK */
 router.post("/check-block", (req, res) => {
   const { mobile } = req.body;
+  if (!mobile) return res.status(400).json({ error: "Mobile number is required" });
 
   db.query(
     "SELECT * FROM blocked_users WHERE mobile=?",
@@ -42,6 +43,7 @@ router.post("/offline",(req,res)=>{
 router.post("/block", verifyAdmin,(req,res)=>{
 
   const { mobile } = req.body;
+  if (!mobile) return res.status(400).json({ success: false, error: "Mobile number is required" });
 
   db.query(
     "INSERT IGNORE INTO blocked_users (mobile) VALUES (?)",
@@ -89,6 +91,7 @@ router.post("/heartbeat", (req, res) => {
 /* UNBLOCK USER */
 router.post("/unblock", verifyAdmin,(req,res)=>{
   const { mobile } = req.body;
+  if (!mobile) return res.status(400).json({ success: false, error: "Mobile number is required" });
 
   db.query(
     "DELETE FROM blocked_users WHERE mobile=?",

@@ -80,20 +80,20 @@ onchange="updateBulkLogActions()">
 <td data-label="File">
 <div class="file-cell">
 <i class="fa-regular ${getFileIcon(log.file_name)}"></i>
-<span>${log.file_name || "-"}</span>
+<span>${escapeHTML(log.file_name || "-")}</span>
 </div>
 </td>
 
 <td data-label="Name">
-${log.name || "-"}
+${escapeHTML(log.name || "-")}
 </td>
 
 <td data-label="Number">
-${log.mobile || "-"}
+${escapeHTML(log.mobile || "-")}
 </td>
 
 <td data-label="IP">
-${log.ip || "-"}
+${escapeHTML(log.ip || "-")}
 </td>
 
 <td data-label="Viewed At">
@@ -368,15 +368,15 @@ function renderFilteredLogs(data){
 <td>
   <div class="file-cell">
     <i class="fa-regular ${getFileIcon(log.file_name)}"></i>
-    <span>${log.file_name || "-"}</span>
+    <span>${escapeHTML(log.file_name || "-")}</span>
   </div>
 </td>
 
 
 
-   <td data-label="Name">${log.name}</td>
-<td data-label="Number">${log.mobile}</td>
-<td data-label="IP">${log.ip}</td>
+   <td data-label="Name">${escapeHTML(log.name)}</td>
+<td data-label="Number">${escapeHTML(log.mobile)}</td>
+<td data-label="IP">${escapeHTML(log.ip)}</td>
 <td data-label="Viewed At">${formatDateTime(log.viewed_at)}</td>
 
 
@@ -622,4 +622,16 @@ if(currentUser){
 
   if(emailEl)
     emailEl.innerText = currentUser.email || "";
+}
+function escapeHTML(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[&<>'"]/g, 
+    tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag])
+  );
 }

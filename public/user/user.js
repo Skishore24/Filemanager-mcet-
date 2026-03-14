@@ -94,8 +94,8 @@ let search = searchBox ? searchBox.value.toLowerCase() : "";
 
     container.innerHTML += `
       <div class="card">
-        <h4>${file.name}</h4>
-        <small>${file.category}</small>
+        <h4>${escapeHTML(file.name)}</h4>
+        <small>${escapeHTML(file.category)}</small>
         <button class="viewBtn" data-index="${index}">View</button>
       </div>
     `;
@@ -479,6 +479,7 @@ const fileUrl = "/secure-files/" + file.name + "?mobile=" + mobile;
       link.click();
       document.body.removeChild(link);
 
+      saveDownloadLog(file.name);
     };
 
   }
@@ -579,34 +580,81 @@ async function saveViewLog(fileName) {
   let logs = JSON.parse(localStorage.getItem("viewLogs")) || [];
 
   // Get location from free API
-let location = { country:"-", region:"-" };
+  let location = { country: "-", region: "-", ip: "Auto" };
+  try {
+      const res = await fetch("https://ipwho.is/");
+      if (res.ok) {
+          const data = await res.json();
+          location.country = data.country || "-";
+          location.region = data.region || "-";
+          location.ip = data.ip || "Auto";
+      }
+  } catch (err) {
+      console.log("Failed to fetch location", err);
+  }
 
   logs.push({
       file: fileName,
       name: name,
       mobile: mobile,
-      ip: "Auto",
+      ip: location.ip,
       country: location.country,
       state: location.region,
       time: new Date().toLocaleString(),
       device: navigator.userAgent
   });
 
-fetch("/api/save-view",{
-  method:"POST",
-  headers:{ "Content-Type":"application/json" },
-  body: JSON.stringify({
-    file:fileName,
-    name:name,
-    mobile:mobile,
-    ip:"Auto",
-    country:location.country,
-    state:location.region,
-    device:navigator.userAgent
-  })
-});
+  localStorage.setItem("viewLogs", JSON.stringify(logs));
+
+  fetch("/api/save-view",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      file:fileName,
+      name:name,
+      mobile:mobile,
+      ip:location.ip,
+      country:location.country,
+      state:location.region,
+      device:navigator.userAgent
+    })
+  });
 }
 
+async function saveDownloadLog(fileName) {
+
+  let name = document.getElementById("userName")?.value || "Unknown";
+  let mobile = sessionStorage.getItem("verifiedMobile") || currentMobile || "Unknown";
+
+  if (mobile === "Unknown") return;
+
+  let location = { country: "-", region: "-", ip: "Auto" };
+  try {
+      const res = await fetch("https://ipwho.is/");
+      if (res.ok) {
+          const data = await res.json();
+          location.country = data.country || "-";
+          location.region = data.region || "-";
+          location.ip = data.ip || "Auto";
+      }
+  } catch (err) {
+      console.log("Failed to fetch location", err);
+  }
+
+  fetch("/api/save-download",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      file: fileName,
+      name: name,
+      mobile: mobile,
+      ip: location.ip,
+      country: location.country,
+      state: location.region,
+      device: navigator.userAgent
+    })
+  });
+}
 
 function getDeviceInfo() {
     return navigator.userAgent;
@@ -768,40 +816,16 @@ if(e.key==="Enter") sendOtp();
   });
 
 
-let devtoolsOpen = false;
-
-setInterval(() => {
-
- const threshold = 160;
-
- if (window.outerWidth - window.innerWidth > threshold ||
-     window.outerHeight - window.innerHeight > threshold) {
-
-   if(!devtoolsOpen){
-     console.clear();
-    console.warn("Developer tools detected");
-     devtoolsOpen = true;
-   }
-
- } else {
-   devtoolsOpen = false;
- }
-
-},1000);
-document.addEventListener("keydown",function(e){
-
- if(
-  e.key === "F12" ||
-  (e.ctrlKey && e.shiftKey && e.key === "I") ||
-  (e.ctrlKey && e.shiftKey && e.key === "J")
- ){
-  e.preventDefault();
-
-  if(!devtoolsOpen){
-  alert("Developer tools blocked");
-  }
-
- }
-
-});
+function escapeHTML(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[&<>'"]/g, 
+    tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag])
+  );
+}
 

@@ -22,6 +22,7 @@ app.use(
           "'self'",
           "'unsafe-inline'",
           "https://cdn.jsdelivr.net",
+          "https://unpkg.com",
           "https://cdnjs.cloudflare.com"
         ],
 
@@ -34,6 +35,7 @@ app.use(
           "'self'",
           "'unsafe-inline'",
           "https://cdn.jsdelivr.net",
+          "https://unpkg.com",
           "https://cdnjs.cloudflare.com",
           "https://fonts.googleapis.com"
         ],
@@ -50,6 +52,7 @@ app.use(
           "data:",
           "blob:",
           "https://cdn.jsdelivr.net",
+          "https://unpkg.com",
           "https://cdnjs.cloudflare.com",
           "https://flagcdn.com",
           "https://*.googleusercontent.com"
@@ -58,8 +61,9 @@ app.use(
         connectSrc: [
   "'self'",
   "https://cdn.jsdelivr.net",
+  "https://unpkg.com",
   "https://cdnjs.cloudflare.com",
-  "https://ipapi.co"
+  "https://ipwho.is/"
 ],
 
         workerSrc: [
